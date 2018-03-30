@@ -1,4 +1,6 @@
 vendor/
-log/*
-cache/*
+storage/log/*
+storage/cache/*
 .env
+.idea/
+.vscode/
