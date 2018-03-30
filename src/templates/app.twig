@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="/css/spectre.css">
+    <link rel="stylesheet" href="/css/spectre-exp.css">
+    <link rel="stylesheet" href="/css/spectre-icons.css">
+    <link rel="stylesheet" href="/css/picker.classic.css">
+    <link rel="stylesheet" href="/css/picker.classic.date.css">
+    <link rel="stylesheet" href="/css/app.css">
+    <link rel="stylesheet" href="/css/app-print.css" media="print"/>
+
+    {% block CSSFILES %}{% endblock %}
+
+    <script src="/js/jquery-3.2.1.min.js"></script>
+    <script src="/js/js.cookie.js"></script>
+    <script src="/js/picker.js"></script>
+    <script src="/js/picker.date.js"></script>
+    <script src="/js/picker.ru_RU.js"></script>
+    <script src="/js/jquery.validate.min.js"></script>
+    <script src="/js/fa-regular.js"></script>
+
+    {% block JSFILES %}{% endblock %}
+
+    <script src="/js/app.js"></script>
+
+    <title>{% block TITLE %}Планы работ-{{ title }}{% endblock %}</title>
+</head>
+<body>
+<div id="layout" class="container">
+    <header class="navbar">
+        {% if (auth_loggedIn()) %}
+            {% block NAVBAR %}{% include '_/menu.twig' %}{% endblock %}
+        {% else %}
+            <section class="navbar-section">
+                <a href="#" class="navbar-brand mr-2 disableClick">Задача "планы работ"</a>
+            </section>
+            <section class="navbar-section"></section>
+        {% endif %}
+    </header>
+    <div class="columns">
+        <div class="column col-12 col-mr-auto">
+            <div class="toast toast-primary hidden">
+                <button class="btn btn-clear float-right"></button>
+                <p></p>
+            </div>
+            <div class="toast toast-error hidden">
+                <button class="btn btn-clear float-right"></button>
+                <p></p>
+            </div>
+            <div class="toast toast-success hidden">
+                <button class="btn btn-clear float-right"></button>
+                <p></p>
+            </div>
+            <div class="toast toast-warning hidden">
+                <button class="btn btn-clear float-right"></button>
+                <p></p>
+            </div>
+        </div>
+    </div>
+    <div class="columns app-main">
+        <div class="column col-12 col-mr-auto">
+            <h1>{{ title|raw }}</h1>
+            <p>{{ content|raw }}</p>
+            {% block CONTENT %}{% endblock %}
+        </div>
+    </div>
+    <!-- modal window template -->
+
+    <div class="modal modal-sm">
+        <div class="modal-overlay"></div>
+        <div class="modal-container">
+            <div class="modal-header">
+                <button class="btn btn-clear float-right"></button>
+                <div class="modal-title h5">Modal title</div>
+            </div>
+            <div class="modal-body">
+                <div class="content">
+                    <!-- content here -->
+                    modal content block
+                </div>
+            </div>
+            <div class="modal-footer">
+                modal footer block
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var flashMessages = {{ flash()|json_encode|raw }};
+</script>
+{% block JSCODE %}{% endblock %}
+</body>
+</html>

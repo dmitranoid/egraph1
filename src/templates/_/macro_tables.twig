@@ -1,0 +1,91 @@
+{# макросы для вывода таблиц #}
+
+{% macro default(data, context='', modfier='', state='') %}
+
+{# Входные параметры: #}
+{# data       (object)  : объект с данными для вывода в таблице #}
+{# context    (string)  : класс контекста .context-table  #}
+{# modifier   (string)  : модификатор класса .table--modifier #}
+{# state      (string)  : состояние таблицы .is-state #}
+
+{# заголовки полей берутся #}
+
+{# пример данных
+
+"data": {
+  "config": {
+    "primaryKey": "item"   // заголовок первого поля таблицы
+  },
+  "footer": {              // подвал таблицы
+    "subtotal": {
+      "col 1": "",
+      "col 2": "",
+      "col 3": "$1000 (NZD)"
+    },
+    "total": {
+      "col 1": "",
+      "col 2": "",
+      "col 3": "$7000 (NZD)"
+    }
+  },
+  "items": {                // данные
+    "item 1": {             // данные первого столбца
+      "col 1": "a",         //
+      "col 2": "b",         //
+      "col 3": "c"          //
+    },
+    "item 2": {
+      "col 1": "d",
+      "col 2": "e",
+      "col 3": "f"
+    },
+    "item 3": {
+      "col 1": "g",
+      "col 2": "h",
+      "col 3": "i"
+    }
+  }
+}
+
+#}
+
+    <table class="table
+                  {% if context %} {{ context }}-table{% endif %}
+                  {% if modifier %} table--{{ modifier }}{% endif %}
+                  {% if state %} is-{{ state }}{% endif %}">
+        <thead class="table-header">
+        <tr>
+            <td class="table-label">{{ data.config.primaryKey }}</td>
+            {% for label, cells in data.items %}
+                {% if loop.first %}
+                    {% for label, cell in cells %}
+                        <td class="table-label">{{ label }}</td>
+                    {% endfor -%}
+                {% endif %}
+            {%- endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for label, cells in data.items %}
+            <tr class="table-row">
+                <td class="table-cell">{{ label }}</td>
+                {% for label, cell in cells %}
+                    <td class="table-cell">{{ cell }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+        </tbody>
+        {% if data.footer %}
+            <tfoot class="table-footer">
+            {% for label, cells in data.footer %}
+                <tr class="table-row">
+                    <td class="table-cell">{{ label }}</td>
+                    {% for label, cell in cells %}
+                        <td class="table-cell">{{ cell }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+            </tfoot>
+        {% endif %}
+    </table>
+{% endmacro %}

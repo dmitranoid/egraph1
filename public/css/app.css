@@ -1,0 +1,228 @@
+.app-main {
+    margin-top: 0.5rem;
+}
+
+.container {
+    width: 90%;
+}
+
+.navbar {
+    background-color: #f0f1f4;
+    height: 2.5rem;
+}
+
+.navbar .logoff {
+    margin: 0.5rem;
+}
+
+.navbar .btn {
+    font-size: 0.8rem;
+    margin-right: 0.2rem;
+}
+
+.error {
+    color: red;
+}
+
+.hidden {
+    display: none;
+}
+
+.disableClick {
+    pointer-events: none;
+}
+
+h1.page-title {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.plans-table tr {
+    height: 3rem;
+    min-height: 3rem;
+}
+
+.navbar .navbar-brand {
+    font-size: 1.5rem;
+}
+
+.plans-table th.plan-actions {
+    min-width: 200px;
+    width: 200px;
+}
+
+.plans-table tr.status-accepted {
+    background-color: #e0fbc6 !important;
+}
+
+.plans-table tr.status-declined {
+    background-color: #ffd0c4 !important;
+}
+
+.plans-table .status-text {
+    margin: 0.3rem 0 0 0;
+    font-style: italic;
+    font-size: 0.7rem;
+    line-height: 1;
+}
+
+.plans-table .status-text span {
+    margin-right: 10px;
+}
+
+.plans-table .status-text span i {
+    margin-right: 6px;
+}
+
+.plans-table ul.plan-actions {
+    list-style: none;
+    margin: 0;
+}
+
+.plans-table ul.plan-actions li {
+    width: 35px;
+    display: inline-block;
+}
+
+.plans-table ul.plan-actions li.list-separator {
+    width: 10px;
+    height: 20px;
+    border-left: dotted;
+}
+
+.plans-table .plan-accept {
+    background-color: #67b168;
+}
+
+.plans-table .plan-decline {
+    background-color: #ce8483;
+}
+
+.plans-table p.comment {
+    margin: 0.3rem 0 0 0;
+    font-style: italic;
+    font-size: 0.6rem;
+    line-height: 1;
+}
+
+.plans-table.main-page th:nth-child(1) {
+    width: 7rem;
+}
+
+.plans-table.main-page th:nth-child(2) {
+    width: 5rem;
+}
+
+.plans-table.main-page th:nth-child(3) {
+    width: 10%;
+}
+
+.plans-table.arch-page th:nth-child(1) {
+    width: 7rem;
+}
+
+.plans-table.arch-page th:nth-child(2) {
+    width: 5rem;
+}
+
+.plans-table.arch-page th:nth-child(5) {
+    width: 14rem;
+}
+
+.arch-page .personal-td p {
+    margin: 0;
+    line-height: 1rem;
+}
+
+.arch-page .personal-td p span {
+    font-weight: 600;
+}
+
+.main-page .personal-td p {
+    margin: 0;
+    line-height: 1rem;
+}
+
+.main-page .personal-td p span {
+    font-weight: 600;
+}
+.main-page-disp .personal-td p {
+    margin: 0;
+    line-height: 1rem;
+}
+
+.main-page-disp .personal-td p span {
+    font-weight: 600;
+}
+.plans-table hr {
+    color: lightgray;
+}
+
+.table-topping .column {
+    margin-top: .7rem;
+}
+
+.table-topping .pagination {
+    margin-top: -.2rem;
+!important;
+}
+
+
+.column.badges {
+    margin-top: 0.3rem;
+!important;
+}
+
+.counter-accepted .badge[data-badge]::after,
+.counter-accepted .badge:not([data-badge])::after {
+    background: #67b168;
+}
+
+.counter-declined .badge[data-badge]::after,
+.counter-declined .badge:not([data-badge])::after {
+    background: #ce8483;
+}
+
+.counter-waiting .badge[data-badge]::after,
+.counter-waiting .badge:not([data-badge])::after {
+    background: #fe9a2e;
+}
+
+div.dept-filter, div.date-filter {
+    display: inline-block;
+}
+
+.dept-filter label {
+    display: inline-block;
+    width: 6rem;
+}
+
+.dept-filter .form-select {
+    display: inline-block;
+    width: 9rem;
+}
+
+.dept-filter.dept-arch .form-select {
+    margin-top: -.3rem;
+}
+
+.date-filter label {
+    display: inline-block;
+    width: 3rem;
+    margin-left: 0.5rem;
+}
+
+.date-filter .form-select {
+    display: inline-block;
+    width: 8rem;
+}
+
+.date-filter input {
+    display: inline-block;
+    width: 8rem;
+}
+
+.easy-autocomplete .form-input {
+    padding: 2px 12px;
+    width: 15rem !important;
+}

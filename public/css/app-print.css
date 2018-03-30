@@ -1,0 +1,62 @@
+*,
+*:before,
+*:after,
+*:first-letter,
+p:first-line,
+div:first-line,
+blockquote:first-line,
+li:first-line {
+    background: transparent !important;
+    color: #000 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+}
+
+.container {
+    width: 100%;
+}
+
+.navbar, .plan-actions, .btn {
+    display: none;
+}
+
+.bold {
+    font-weight: 600;
+}
+
+.printable, .printable p {
+    margin: 0;
+}
+
+table.printable {
+    width: 100%;
+    border: gray solid;
+    border-collapse: collapse;
+}
+
+table.printable th {
+    padding: 0.5rem;
+    background: darkgray;
+    border-bottom: 1px solid black; /* Линия снизу */
+}
+
+table.printable td {
+    border-bottom: 1px solid gray; /* Линия снизу */
+    padding-left: 4px;
+}
+
+.plans-table.printable th:nth-child(1) {
+    width: 10rem;
+}
+
+.plans-table.printable th:nth-child(2) {
+    width: 5rem;
+}
+
+.plans-table.printable th:nth-child(5) {
+    width: 15rem;
+}
+
+table.printable .personal-td {
+    margin: 0.2rem;
+}

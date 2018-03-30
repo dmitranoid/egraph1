@@ -1,0 +1,28 @@
+<section class="navbar-section">
+        <a href="{{ path_for("main") }}" class="btn btn-link">Планы(активные)</a>
+        <a href="{{ path_for("plan:index") }}" class="btn btn-link">Планы(архив)</a>
+        <a href="{{ path_for("dept:index") }}" class="btn btn-link">Службы</a>
+        {% if (auth_has_rights('пользователи','index')) %}
+            <a href="{{ path_for("user:index") }}" class="btn btn-link">Пользователи</a>
+        {% endif %}
+        <a href="{{ path_for("object:index") }}" class="btn btn-link">Объекты</a>
+    </section>
+
+    <section class="navbar-section">
+        <div class="logoff">
+            <a
+                    href="#"
+                    class="btn btn-link"
+                    title="личный кабинет"
+            >
+                <i class="fa fa-user-o"></i> {{ auth_user().name }}
+            </a>
+        </div>
+        <a
+                href="{{ path_for('auth:logoff') }}"
+                class="btn"
+                title="завершить сеанс"
+        >
+            <i class="fa fa-sign-out"></i>
+        </a>
+    </section>
