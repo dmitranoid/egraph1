@@ -5,29 +5,32 @@ define('ROOT_DIR', realpath(__DIR__.'/../..'));
 
 require ROOT_DIR . '/vendor/autoload.php';
 
-$dotenv = new Dotenv\Dotenv(__DIR__);
+$dotenv = new Dotenv\Dotenv(APP_DIR);
 $dotenv->overload();
 
-// asserts 
-assert_options(ASSERT_ACTIVE, true);
-assert_options(ASSERT_BAIL, true);
-//assert_options(ASSERT_CALLBACK, null);
-
-// xdebug
-ini_set('xdebug.var_display_max_depth', 10);
-ini_set('xdebug.var_display_max_children', 256);
-ini_set('xdebug.var_display_max_data', 1024);
-// end xdebug
-
+if ('dev' == strtolower(getenv('ENV'))) {
+    // asserts
+    assert_options(ASSERT_ACTIVE, true);
+    assert_options(ASSERT_BAIL, true);
+    //assert_options(ASSERT_CALLBACK, null);
+    // xdebug
+    ini_set('xdebug.var_display_max_depth', 10);
+    ini_set('xdebug.var_display_max_children', 256);
+    ini_set('xdebug.var_display_max_data', 1024);
+} else {
+    assert_options(ASSERT_ACTIVE, false);
+}
 // session
 session_start();
 
+// Slim
 $slimSettings = [
     'determineRouteBeforeAppMiddleware' => false,
     'displayErrorDetails' => getenv('DEBUG'),
 ];
 $app = new \Slim\App($slimSettings);
 
+// DI
 $definitions = require APP_DIR . '/Config/dependencies.php';
 $container = (new \DI\ContainerBuilder())
     ->useAnnotations(false)
@@ -36,9 +39,6 @@ $container = (new \DI\ContainerBuilder())
     ->build();
 
 $app->setContainer($container);
-
-$container->get('logger')->info('logger test');
-//die();
 
 // debug helpers
 require APP_DIR . '/Helpers/DebugFunctions.php';
