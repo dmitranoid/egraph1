@@ -47,7 +47,8 @@ require APP_DIR . '/Helpers/DebugFunctions.php';
 require APP_DIR . '/Config/middleware.php';
 
 // Register routes
-require APP_DIR . '/routes.php';
+require APP_DIR . '/routes-api.php';
+require APP_DIR . '/routes-web.php';
 
 // initial db settings
 if('sqlite' == $container->get('settings')['database']['driver']){
