@@ -11,6 +11,5 @@ class Voltage  extends Enum
     const V110 = '110';    
     const V220 = '220';
     const V330 = '330';    
-    const V750 = '750';    
-
+    const V750 = '750';
 }

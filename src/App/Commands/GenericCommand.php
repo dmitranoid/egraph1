@@ -11,10 +11,5 @@ namespace App\Commands;
 
 abstract class BaseCommand implements CommandInterface
 {
-
-
-    public function execute()
-    {
-
-    }
+    abstract public function execute();
 }

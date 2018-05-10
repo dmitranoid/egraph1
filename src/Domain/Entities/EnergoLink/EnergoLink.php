@@ -12,9 +12,6 @@ Domain\Exceptions\DomainException;
 class EnergoLink {
     use EventTrait;
 
-    const STATUS_ACTIVE = 'a';
-    const STATUS_DISABLED = 'd';
-
     private $srcConnection;
     private $dstConnection;
     private $name;

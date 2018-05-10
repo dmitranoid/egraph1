@@ -1,6 +1,7 @@
 vendor/
 storage/log/
 storage/cache/
-.env
 .idea/
 .vscode/
+.env
+composer.lock

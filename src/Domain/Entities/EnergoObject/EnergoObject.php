@@ -13,10 +13,6 @@ use Domain\Entities\EventTrait,
 class EnergoObject {
     use EventTrait;
 
-    const TYPE_PS = 'PS';
-    const TYPE_TP = 'TP';
-
-
     /**
      * Наименование объекта
      *

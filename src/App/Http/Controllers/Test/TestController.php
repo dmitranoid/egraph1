@@ -22,7 +22,6 @@ class TestController
      */
     private $logger;
 
-
     /**
      * @var ViewInterface
      */

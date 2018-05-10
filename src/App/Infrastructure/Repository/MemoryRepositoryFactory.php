@@ -3,7 +3,7 @@
 namespace App\Infrastructure\Repository;
 
 
-use App\Infrastructure\Hydrator;
+use App\Infrastructure\Hydrator\Hydrator;
 
 class MemoryRepositoryFactory
 {
@@ -13,14 +13,12 @@ class MemoryRepositoryFactory
      */
     protected $db;
 
-    public function __construct(\PDO $db){
-        $this->db = $db;
+    public function __construct(){
     }
 
     public function getRepository($entityName){
-
-        $fullClassname = "App\Infrastructure\Repository\Memory\\{$entityName}Repository";
+        $fullClassname = "App\Infrastructure\Repository\Memory\{$entityName}Repository";
         $hydrator = new Hydrator();        
-        return new $fullClassname($this->db, $hydrator);
+        return new $fullClassname( $hydrator);
     }
 }

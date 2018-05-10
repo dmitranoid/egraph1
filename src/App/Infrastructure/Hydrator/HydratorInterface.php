@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Infractructure\Interfaces;
+namespace App\Infractructure\Hydrator;
 
 interface HydratorInterface 
 {

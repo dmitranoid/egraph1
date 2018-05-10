@@ -3,25 +3,21 @@
 namespace App\Infrastructure\Repository\Memory;
 
 
-use App\Infractructure\Hydrator;
+use App\Infractructure\Hydrator\HydratorInterface;
 
-class BaseRepository
+class BaseMemoryRepository
 {
-
     /**
      * Entity hydrator
      *
-     * @var Hydrator
-     */
+     * @var HydratorInterface;
     protected $hydrator;
 
     /**
      * constructor
-     *
-     * @return void
+     * @var HydratorInterface;
      */
     public function __construct($hydrator) {
-        $this->db = $db;
         $this->hydrator = $hydrator;
     }
 }

@@ -12,10 +12,6 @@ $app->get('/', function(\Psr\Http\Message\RequestInterface $request, \Psr\Http\M
 $app->get('/test', '\App\Http\Controllers\Test\TestController:indexAction')->setName('test.index');
 $app->get('/test2', '\App\Http\Controllers\Test\TestController:testAction')->setName('test.test');
 
-$app->group('/api/v1/', function(){
-
-});
-
 $app->get('/testdomain', function($request, $response, $args) use ($app) {
 
     $container = $app->getContainer();
