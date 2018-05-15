@@ -1,9 +1,9 @@
 <?php
 
-namespace  Domain\Entities\EnergoObject;
+namespace Domain\Entities\EnergoLink;
 
 use Domain\Entities\EventTrait,
-Domain\Entites\EnergoConnection\EnergoConnection,
+    Domain\Entities\EnergoConnection\EnergoConnection,
 Domain\Exceptions\DomainException;
 
 /**

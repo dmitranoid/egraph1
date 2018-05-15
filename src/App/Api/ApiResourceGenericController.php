@@ -11,9 +11,20 @@ namespace App\Api;
 
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Log\LoggerInterface;
 
 class ApiResourceGenericController implements ApiResourceControllerInterface
 {
+    /**
+     * @var LoggerInterface
+     */
+    var $logger;
+
+    /**
+     * @var \PDO
+     */
+    var $db;
+
     /**
      * @var array список разрешенных для класса методов
      */
@@ -23,12 +34,20 @@ class ApiResourceGenericController implements ApiResourceControllerInterface
         'post',
     ];
 
+    public function __construct(LoggerInterface $logger, \PDO $db)
+    {
+        $this->logger = $logger;
+        $this->db = $db;
+    }
+
     public function __invoke(RequestInterface $request, ResponseInterface $response, array $args) {
         $method = strtolower($args['method'] ?? '');
         if(!in_array($method, $this->allowedActions)){
-            $body = $response->getBody();
-            $body->write('not found');
-            return $response->withStatus(404)->withBody($body);
+            $errorMessage = [
+                'status' => 'error',
+                'message' => sprintf('%s->%s not found', $args['class'], $method),
+            ];
+            return $response->withStatus(404)->withJson($errorMessage);
         }
         return (call_user_func([$this, $method], $request, $response, $args));
     }

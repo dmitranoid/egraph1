@@ -28,6 +28,22 @@ $slimSettings = [
     'determineRouteBeforeAppMiddleware' => false,
     'displayErrorDetails' => getenv('DEBUG'),
 ];
+
+$console = PHP_SAPI == 'cli' ? true : false;
+
+if ($console) {
+    set_time_limit(0);
+    $argv = $GLOBALS['argv'];
+    array_shift($argv);
+    $pathInfo = implode('/', $argv);
+    //Convert $argv to PATH_INFO
+    $env = \Slim\Http\Environment::mock([
+        'SCRIPT_NAME' => $_SERVER['SCRIPT_NAME'],
+        'REQUEST_URI' => count($argv) >= 2 ? "/{$argv[0]}/{$argv[1]}" : $pathInfo
+    ]);
+    $slimSettings['environment'] = $env;
+}
+
 $app = new \Slim\App($slimSettings);
 
 // DI
@@ -47,9 +63,12 @@ require APP_DIR . '/Helpers/DebugFunctions.php';
 require APP_DIR . '/Config/middleware.php';
 
 // Register routes
-require APP_DIR . '/routes-api.php';
-require APP_DIR . '/routes-web.php';
-
+if ($console) {
+    require APP_DIR . '/routes-cli.php';
+} else {
+    require APP_DIR . '/routes-api.php';
+    require APP_DIR . '/routes-web.php';
+}
 // initial db settings
 if('sqlite' == $container->get('settings')['database']['driver']){
     $container->get('db')->exec('PRAGMA journal_mode=MEMORY;');

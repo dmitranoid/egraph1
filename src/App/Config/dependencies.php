@@ -8,14 +8,9 @@ use function DI\get;
 use function DI\factory;
 
 return [
-// -----------------------------------------------------------------------------
 // Settings
-// -----------------------------------------------------------------------------
-    'settings' => require APP_DIR . '/config/settings.php',
-// -----------------------------------------------------------------------------
+    'settings' => require APP_DIR . '/Config/settings.php',
 // Service providers
-// -----------------------------------------------------------------------------
-
     \App\Infrastructure\View\ViewInterface::class => factory(function (ContainerInterface $c) use ($app){
         $settings = $c->get('settings');
         $twig = new Slim\Views\Twig($settings['view']['template_path'], $settings['view']['twig']);
@@ -43,6 +38,7 @@ return [
         $dsn = "{$db['driver']}:{$db['dbname']}";
         return new \Pdo($dsn, $db['user'], $db['password']);
     }),
+    \PDO::class => get('db'),
     'repositoryFactory' => function(ContainerInterface $c) {
         $db = $c->get('db');
         $repositoryFactory = new App\Infrastructure\Repository\PDORepositoryFactory($db);

@@ -1,10 +1,11 @@
 <?php
 
-namespace  Domain\Entities\EnergoObject;
+namespace Domain\Entities\EnergoConnection;
 
 use Domain\Entities\EventTrait,
+    Domain\Entities\EnergoObject\EnergoObject,
     Domain\Enums\Voltage,
-    Domain\Enums\TrasnmissionDirection,
+    Domain\Enums\TransmissionDirection,
     Domain\Enums\ActivityStatus,
     Domain\Exceptions\DomainException;
     
@@ -22,7 +23,8 @@ class EnergoConnection {
     private $direction;
     private $activityStatus;
 
-    public function __construct($id, EnergoObject $energoObject , string $name , string $nom, Voltage $voltage, TrasnmissionDirection $direction, ActivityStatus $activityStatus) {
+    public function __construct($id, EnergoObject $energoObject, string $name, string $nom, Voltage $voltage, TransmissionDirection $direction, ActivityStatus $activityStatus)
+    {
         $this->id = $id;
         $this->energoObject = $energoObject;
         $this->name = $name;

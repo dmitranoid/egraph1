@@ -9,13 +9,14 @@
 namespace App\Http\Controllers;
 
 
+use App\Infrastructure\View\ViewInterface;
+use Psr\Log\LoggerInterface;
+
 class HomeController
 {
 
     /**
      * HomeController constructor.
      */
-    public function __construct()
-    {
-    }
+
 }

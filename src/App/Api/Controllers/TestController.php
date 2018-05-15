@@ -6,7 +6,7 @@
  * Time: 11:02
  */
 
-namespace App\Api\Controllers\Test;
+namespace App\Api\Controllers;
 
 
 use App\Api\ApiResourceGenericController;

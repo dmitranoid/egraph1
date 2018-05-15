@@ -9,7 +9,7 @@
 namespace App\Commands;
 
 
-abstract class BaseCommand implements CommandInterface
+abstract class GenericCommand implements CommandInterface
 {
     abstract public function execute();
 }
