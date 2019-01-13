@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Infractructure\HydratorInterface;
+namespace App\Infractructure\Interfaces;
 
 interface HydratorInterface 
 {
     /**
      * Create Domain Object from array data
      *
-     * @param DomainClass $target
+     * @param EntityClass $target
      * @param array $data
-     * @return DomainObject
+     * @return EntityObject
      */
     public function hydrate($target, array $data);
 
