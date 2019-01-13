@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Infractructure\Interfaces;
+namespace App\Infractructure\Hydrator;
 
-interface HydratorInterface 
+interface HydratorInterface
 {
     /**
      * Create Domain Object from array data
