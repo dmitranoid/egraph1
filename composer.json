@@ -8,7 +8,7 @@
         {
             "name": "Dzmitry Shl",
             "email": "dmitranoid@gmail.com",
-            "homepage": "http://akrabat.com"
+            "homepage": "http://none.io"
         }
     ],
     "prefer-stable" : true,
@@ -38,10 +38,13 @@
         "myclabs/php-enum": "^1.5"
     },
     "require-dev": {
-      "phpunit/phpunit": "^6.4"
+      "phpunit/phpunit": "^7.0"
     },
     "scripts" : {
-        "start": "php -S 0.0.0.0:8080 -t public public/index.php",
+        "post-install-cmd": {
+
+        },
+        "start": "php -S 0.0.0.0:80 -t public public/index.php",
         "test": "vendor\\bin\\phpunit.bat tests"
     }
 }

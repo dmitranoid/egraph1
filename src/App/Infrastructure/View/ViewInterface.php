@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: svt3
- * Date: 28.03.2018
- * Time: 7:52
- */
+
 
 namespace App\Infrastructure\View;
 
@@ -19,5 +14,5 @@ interface ViewInterface
      * @param array $data
      * @return ResponseInterface
      */
-    function render(ResponseInterface $response, $template, $data = []):ResponseInterface;
+    public function render(ResponseInterface $response, $template, $data = []):ResponseInterface;
 }
