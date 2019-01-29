@@ -3,7 +3,7 @@
 namespace App\Infrastructure\Repository\PDO;
 
 
-use App\Infractructure\Hydrator;
+use App\Infractructure\Hydrator\HydratorInterface;
 
 class BaseRepository
 {
@@ -17,7 +17,7 @@ class BaseRepository
     /**
      * Entity hydrator
      *
-     * @var Hydrator
+     * @var HydratorInterface
      */
     protected $hydrator;
 
@@ -25,6 +25,7 @@ class BaseRepository
      * constructor
      *
      * @param \PDO $db
+     * @param HydratorInterface $hydrator
      * @return void
      */
     public function __construct(\PDO $db, $hydrator) {

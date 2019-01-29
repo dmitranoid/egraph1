@@ -27,11 +27,12 @@
         }
     },
     "require": {
-        "php": "^7.0",
+        "slim/http": "0.5",
+        "slim/psr7": "dev-master",
+        "slim/slim": "4.x-dev",
         "slim/twig-view": "^2.0",
         "slim/flash": "^0.1.0",
         "monolog/monolog": "^1.13",
-        "slim/slim": "^4.0",
         "php-di/php-di": "^6.0",
         "vlucas/phpdotenv": "^2.4",
         "ramsey/uuid": "^3.7",
@@ -41,9 +42,6 @@
       "phpunit/phpunit": "^7.0"
     },
     "scripts" : {
-        "post-install-cmd": {
-
-        },
         "start": "php -S 0.0.0.0:80 -t public public/index.php",
         "test": "vendor\\bin\\phpunit.bat tests"
     }

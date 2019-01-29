@@ -1,5 +1,13 @@
 <?php 
 
+use Slim\App;
+use Slim\Http\Factory\DecoratedResponseFactory;
+use Slim\Http\Decorators\ServerRequestDecorator;
+use Slim\Middleware\ErrorMiddleware;
+use Slim\Psr7\Factory\ResponseFactory;
+use Slim\Psr7\Factory\ServerRequestFactory;
+use Slim\Psr7\Factory\StreamFactory;
+
 define('APP_DIR', realpath(__DIR__));
 define('ROOT_DIR', realpath(__DIR__.'/../..'));
 
@@ -44,7 +52,9 @@ if ($console) {
     $slimSettings['environment'] = $env;
 }
 
-$app = new \Slim\App($slimSettings);
+
+$responseFactory = new DecoratedResponseFactory(new ResponseFactory(), new StreamFactory());
+$app = new App($responseFactory);
 
 // DI
 $definitions = require APP_DIR . '/Config/dependencies.php';
@@ -54,6 +64,7 @@ $container = (new \DI\ContainerBuilder())
     ->addDefinitions($definitions)
     ->build();
 
+$app->addSettings($slimSettings);
 $app->setContainer($container);
 
 // debug helpers
@@ -75,5 +86,6 @@ if('sqlite' == $container->get('settings')['database']['driver']){
     $container->get('db')->exec('PRAGMA busy_timeout=2000;');      
 }
 
-// Run!
-$app->run();
+$request = ServerRequestFactory::createFromGlobals();
+$serverRequest = new ServerRequestDecorator($request);
+$app->run($serverRequest);
