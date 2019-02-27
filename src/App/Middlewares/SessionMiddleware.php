@@ -4,6 +4,9 @@ namespace App\Middlewares;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+use Slim\Handlers\Strategies\RequestHandler;
 
 /**
  *
@@ -25,7 +28,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
  * https://github.com/bryanjhv/slim-session
  *
  */
-class SessionMiddleware
+class SessionMiddleware implements MiddlewareInterface
 {
     /**
      * @var array
@@ -73,19 +76,10 @@ class SessionMiddleware
         }
     }
 
-    /**
-     * Called when middleware needs to be executed.
-     *
-     * @param \Psr\Http\Message\ServerRequestInterface $request PSR7 request
-     * @param \Psr\Http\Message\ResponseInterface $response PSR7 response
-     * @param callable $next Next middleware
-     *
-     * @return \Psr\Http\Message\ResponseInterface
-     */
-    public function __invoke(Request $request, Response $response, callable $next)
+    public function process(Request $request, RequestHandlerInterface $next): Response
     {
         $this->startSession();
-        return $next($request, $response);
+        return $next->handle($request);
     }
 
     /**

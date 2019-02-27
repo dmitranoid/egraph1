@@ -64,7 +64,7 @@ class TestController
 
     public function testDomainAction(ServerRequestInterface $request, ResponseInterface $response, $args)
     {
-        $energoObjectRepository = new
+        //$energoObjectRepository = new
 
         $energoObject = new EnergoObject(
             'Барановичи',

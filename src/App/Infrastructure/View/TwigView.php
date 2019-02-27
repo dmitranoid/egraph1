@@ -21,7 +21,8 @@ class TwigView implements ViewInterface
 
     function render(ResponseInterface $response, $template, $data = []): ResponseInterface
     {
-        $response->getBody()->write($this->twig->render($template, $data));
+        $renderedContent = $this->twig->render($template, $data);
+        $response->getBody()->write($renderedContent);
         return $response;
     }
 

@@ -52,7 +52,6 @@ if ($console) {
 
 
 $responseFactory = new DecoratedResponseFactory(new ResponseFactory(), new StreamFactory());
-$app = new App($responseFactory);
 
 // DI
 $definitions = require APP_DIR . '/Config/dependencies.php';
@@ -62,8 +61,8 @@ $container = (new \DI\ContainerBuilder())
     ->addDefinitions($definitions)
     ->build();
 
+$app = new App($responseFactory, $container);
 $app->addSettings($slimSettings);
-$app->setContainer($container);
 
 // Debug helpers
 require APP_DIR . '/Helpers/DebugFunctions.php';
