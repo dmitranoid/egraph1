@@ -1,18 +1,14 @@
 <?php
-/**
- * @var Slim\App $app
- */
 
 function responseJsonError(\Psr\Http\Message\ResponseInterface $response, $statusCode = 200, $message = [])
 {
     return $response->withStatus($statusCode)->withJson($message);
 }
 
-$app->group('/api/v1/', function() {
+$app->group('/api/v1/', function (Slim\App $app) {
+    $ci = $app->getContainer();
 
-    $ci = $this->getContainer();
-
-    $this->any('{class}/{method}', function ($request, $response, $args) use ($ci) {
+    $app->any('{class}/{method}', function ($request, $response, $args) use ($ci) {
         // api classes resolver
         $namespace = 'App\Api\Controllers\\';
         $class = new ReflectionClass($namespace . $args['class'] . 'Controller');
@@ -30,4 +26,4 @@ $app->group('/api/v1/', function() {
         $response = call_user_func($ci->get($className), $request, $response, $args);
         return $response;
     });
-});
+})->add(new \App\Middlewares\CORSMiddleware());

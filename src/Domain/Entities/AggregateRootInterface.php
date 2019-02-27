@@ -1,6 +1,6 @@
 <?php
 
-namespace Domain\Entites;
+namespace Domain\Entities;
 
 interface AggregateRoot 
 {

@@ -2,7 +2,6 @@
 
 namespace App\Infrastructure\Hydrator;
 
-use App\Infractructure\Interfaces\HydratorInterface;
 
 class Hydrator implements HydratorInterface
 {

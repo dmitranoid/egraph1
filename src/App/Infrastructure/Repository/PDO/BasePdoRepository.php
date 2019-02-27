@@ -5,7 +5,7 @@ namespace App\Infrastructure\Repository\PDO;
 
 use App\Infractructure\Hydrator\HydratorInterface;
 
-class BaseRepository
+class BasePdoRepository
 {
     /**
      * db handle

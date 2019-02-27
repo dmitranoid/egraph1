@@ -3,7 +3,7 @@
 namespace App\Infrastructure\Repository;
 
 
-use App\Infrastructure\Hydrator;
+use App\Infrastructure\Hydrator\Hydrator;
 
 class PDORepositoryFactory
 {

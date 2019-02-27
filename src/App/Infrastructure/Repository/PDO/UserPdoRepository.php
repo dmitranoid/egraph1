@@ -6,7 +6,7 @@ namespace App\Infrastructure\Repository\PDO;
 use Domain\Repositories\UserRepositoryInterface,
     Domain\Entities\User\User;
 
-class UserRepository extends BaseRepository implements UserRepositoryInterface
+class UserPdoRepository extends BasePdoRepository implements UserRepositoryInterface
 {
     protected $fields = [
         'id',

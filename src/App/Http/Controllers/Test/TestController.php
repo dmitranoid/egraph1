@@ -10,8 +10,13 @@ namespace App\Http\Controllers\Test;
 
 
 use App\Infrastructure\View\ViewInterface;
+use Domain\Entities\EnergoObject\EnergoObject;
+use Domain\Enums\ActivityStatus;
+use Domain\Enums\EnergoObjectType;
+use Domain\Enums\Voltage;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 
 class TestController
@@ -27,6 +32,11 @@ class TestController
      */
     private $view;
 
+    /**
+     * TestController constructor.
+     * @param ViewInterface $view
+     * @param LoggerInterface $logger
+     */
     public function __construct(ViewInterface $view, LoggerInterface $logger)
     {
         $this->logger = $logger;
@@ -34,14 +44,37 @@ class TestController
         $this->logger->info(__CLASS__.':'.__METHOD__);
     }
 
-    public function indexAction(RequestInterface $request, ResponseInterface $response, $args)
+    /*
+        public function __construct(ContainerInterface $c)
+        {
+            $this->logger = $c->get('logger');
+            $this->view = $c->get('view');
+            $this->logger->info(__CLASS__.':'.__METHOD__);
+        }
+    */
+    public function indexAction(ServerRequestInterface $request, ResponseInterface $response, $args)
     {
         return ($this->view->render($response, 'test\index.twig', ['content'=>__CLASS__. ' - ' . __METHOD__]));
     }
 
-    public function testAction(RequestInterface $request, ResponseInterface $response, $args)
+    public function testAction(ServerRequestInterface $request, ResponseInterface $response, $args)
     {
         return ($this->view->render($response, 'test\index.twig', ['content'=>__CLASS__. ' - ' . __METHOD__]));
+    }
+
+    public function testDomainAction(ServerRequestInterface $request, ResponseInterface $response, $args)
+    {
+        $energoObjectRepository = new
+
+        $energoObject = new EnergoObject(
+            'Барановичи',
+            new EnergoObjectType(EnergoObjectType::PS),
+            new Voltage(Voltage::V330),
+            new ActivityStatus(ActivityStatus::ENABLED)
+        );
+
+        $response->getBody()->write(var_export($energoObject));
+        return $response;
     }
 
 }
