@@ -2,14 +2,17 @@
 
 namespace Domain\Repositories;
 
-
 use Domain\Entities\User\User;
 
 interface UserRepositoryInterface
 {
-    function findById(int $id);
-    function findByName($username);    
-    function add(User $user);
-    function remove(User $user);
-    function update(User $user);    
+    public function findById(int $id);
+
+    public function findByName($username);
+
+    public function add(User $user);
+
+    public function remove(User $user);
+
+    public function update(User $user);
 }

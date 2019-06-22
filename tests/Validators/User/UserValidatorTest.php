@@ -28,7 +28,7 @@ class UserValidatorTest extends TestCase
         $userValidator = new UserValidator();
         $result = $userValidator->validate($data);
 
-        $this->assertEquals(['name'=>''], $result);
+        $this->assertEquals(false, $result);
 
     }    
 }

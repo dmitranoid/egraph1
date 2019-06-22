@@ -41,7 +41,7 @@ class TestController
     {
         $this->logger = $logger;
         $this->view = $view;
-        $this->logger->info(__CLASS__.':'.__METHOD__);
+//        $this->logger->info(__CLASS__.':'.__METHOD__);
     }
 
     /*
@@ -59,6 +59,7 @@ class TestController
 
     public function testAction(ServerRequestInterface $request, ResponseInterface $response, $args)
     {
+        $b = 100 / 0;
         return ($this->view->render($response, 'test\index.twig', ['content'=>__CLASS__. ' - ' . __METHOD__]));
     }
 

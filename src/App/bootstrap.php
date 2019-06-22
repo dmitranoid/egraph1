@@ -1,19 +1,22 @@
 <?php
 
+use DI\ContainerBuilder;
 use Slim\App;
-use Slim\Http\Factory\DecoratedResponseFactory;
-use Slim\Http\Decorators\ServerRequestDecorator;
-use Slim\Middleware\ErrorMiddleware;
-use Slim\Psr7\Factory\ResponseFactory;
-use Slim\Psr7\Factory\ServerRequestFactory;
-use Slim\Psr7\Factory\StreamFactory;
+use Slim\Factory\AppFactory;
+use Dotenv\Dotenv;
+use Slim\Http\Environment;
 
 define('APP_DIR', realpath(__DIR__));
 define('ROOT_DIR', realpath(__DIR__.'/../..'));
+define('SERVER_ROOT_DIR', ROOT_DIR);
+
 
 require ROOT_DIR . '/vendor/autoload.php';
 
-$dotenv = new Dotenv\Dotenv(APP_DIR);
+$dotenv = new Dotenv(SERVER_ROOT_DIR);
+$dotenv->overload();
+$env = strtolower(getenv('mode'));
+$dotenv = new Dotenv(SERVER_ROOT_DIR, $env . '.env');
 $dotenv->overload();
 
 if ('dev' == strtolower(getenv('ENV'))) {
@@ -29,12 +32,6 @@ if ('dev' == strtolower(getenv('ENV'))) {
     assert_options(ASSERT_ACTIVE, false);
 }
 
-// Slim
-$slimSettings = [
-    'determineRouteBeforeAppMiddleware' => false,
-    'displayErrorDetails' => getenv('DEBUG'),
-];
-
 $console = PHP_SAPI == 'cli' ? true : false;
 
 if ($console) {
@@ -43,26 +40,24 @@ if ($console) {
     array_shift($argv);
     $pathInfo = implode('/', $argv);
     //Convert $argv to PATH_INFO
-    $env = \Slim\Http\Environment::mock([
+    $env = Environment::mock(
+        [
         'SCRIPT_NAME' => $_SERVER['SCRIPT_NAME'],
         'REQUEST_URI' => count($argv) >= 2 ? "/{$argv[0]}/{$argv[1]}" : $pathInfo
-    ]);
-    $slimSettings['environment'] = $env;
+        ]
+    );
 }
-
-
-$responseFactory = new DecoratedResponseFactory(new ResponseFactory(), new StreamFactory());
 
 // DI
 $definitions = require APP_DIR . '/Config/dependencies.php';
-$container = (new \DI\ContainerBuilder())
+$container = (new ContainerBuilder())
     ->useAnnotations(false)
     ->useAutowiring(true)
     ->addDefinitions($definitions)
     ->build();
 
-$app = new App($responseFactory, $container);
-$app->addSettings($slimSettings);
+AppFactory::setContainer($container);
+$app = AppFactory::create();
 
 // Debug helpers
 require APP_DIR . '/Helpers/DebugFunctions.php';
@@ -78,6 +73,4 @@ if ($console) {
     require APP_DIR . '/routes-web.php';
 }
 
-$request = ServerRequestFactory::createFromGlobals();
-$serverRequest = new ServerRequestDecorator($request);
-$app->run($serverRequest);
+$app->run();
