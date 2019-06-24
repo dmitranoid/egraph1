@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 use Slim\App;
 use Slim\Http\Factory\DecoratedResponseFactory;
@@ -28,8 +28,6 @@ if ('dev' == strtolower(getenv('ENV'))) {
 } else {
     assert_options(ASSERT_ACTIVE, false);
 }
-// session
-session_start();
 
 // Slim
 $slimSettings = [
@@ -54,7 +52,6 @@ if ($console) {
 
 
 $responseFactory = new DecoratedResponseFactory(new ResponseFactory(), new StreamFactory());
-$app = new App($responseFactory);
 
 // DI
 $definitions = require APP_DIR . '/Config/dependencies.php';
@@ -64,10 +61,10 @@ $container = (new \DI\ContainerBuilder())
     ->addDefinitions($definitions)
     ->build();
 
+$app = new App($responseFactory, $container);
 $app->addSettings($slimSettings);
-$app->setContainer($container);
 
-// debug helpers
+// Debug helpers
 require APP_DIR . '/Helpers/DebugFunctions.php';
 
 // Register middleware
@@ -79,11 +76,6 @@ if ($console) {
 } else {
     require APP_DIR . '/routes-api.php';
     require APP_DIR . '/routes-web.php';
-}
-// initial db settings
-if('sqlite' == $container->get('settings')['database']['driver']){
-    $container->get('db')->exec('PRAGMA journal_mode=MEMORY;');
-    $container->get('db')->exec('PRAGMA busy_timeout=2000;');      
 }
 
 $request = ServerRequestFactory::createFromGlobals();

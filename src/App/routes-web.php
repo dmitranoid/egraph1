@@ -11,6 +11,7 @@ $app->get('/', function(\Psr\Http\Message\RequestInterface $request, \Psr\Http\M
 
 $app->get('/test', '\App\Http\Controllers\Test\TestController:indexAction')->setName('test.index');
 $app->get('/test2', '\App\Http\Controllers\Test\TestController:testAction')->setName('test.test');
+$app->get('/testd', '\App\Http\Controllers\Test\TestController:testDomainAction')->setName('test.domain');
 
 $app->get('/testdomain', function($request, $response, $args) use ($app) {
 
@@ -29,7 +30,7 @@ $app->get('/testdomain', function($request, $response, $args) use ($app) {
         return $response;    
     }
 
-    $userService->create($userData['name']?:'null');
-
+    $userService->create($userData['name'] ?? 'null');
+    return $response;
 });
     

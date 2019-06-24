@@ -1,17 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: svt3
- * Date: 28.03.2018
- * Time: 8:06
- */
 
 namespace App\Infrastructure\View;
 
-
-use App\Infrastructure\View\ViewInterface;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Views\Twig;
+use Twig\Environment;
 
 class TwigView implements ViewInterface
 {
@@ -19,17 +12,18 @@ class TwigView implements ViewInterface
 
     /**
      * TwigView constructor.
-     * @param Twig $twig
+     * @param Environment $twig
      */
-    public function __construct(Twig $twig)
+    public function __construct(Environment $twig)
     {
         $this->twig = $twig;
     }
 
     function render(ResponseInterface $response, $template, $data = []): ResponseInterface
     {
-        return $this->twig->render($response, $template, $data);
+        $renderedContent = $this->twig->render($template, $data);
+        $response->getBody()->write($renderedContent);
+        return $response;
     }
-
 
 }

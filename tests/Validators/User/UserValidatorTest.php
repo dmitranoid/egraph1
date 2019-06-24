@@ -22,14 +22,13 @@ class UserValidatorTest extends TestCase
 
     public function testUserValidator_Wrong_Data() {
         //не сделан валидатор
-/*
         $data = [
            'name'=>'', 
         ];
-        $userValidator = new \App\Validators\User\UserValidator();
+        $userValidator = new UserValidator();
         $result = $userValidator->validate($data);
 
         $this->assertEquals(['name'=>''], $result);
-*/
+
     }    
 }

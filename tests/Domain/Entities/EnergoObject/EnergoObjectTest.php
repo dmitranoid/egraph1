@@ -1,12 +1,13 @@
 <?php
 
-namespace Domain\Entities\EnergoObject;
+namespace Test\Domain\Entities\EnergoObject;
 
 use PHPUnit\Framework\TestCase;
 
 use Domain\Enums\Voltage,
     Domain\Enums\ActivityStatus,
-    Domain\Enums\EnergoObjectType;
+    Domain\Enums\EnergoObjectType,
+    Domain\Entities\EnergoObject\EnergoObject;
 
 class EnergoObjectTest extends TestCase
 {

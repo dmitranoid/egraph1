@@ -11,48 +11,39 @@ return [
 // Settings
     'settings' => require APP_DIR . '/Config/settings.php',
 // Service providers
-    \App\Infrastructure\View\ViewInterface::class => factory(function (ContainerInterface $c) use ($app){
-        $settings = $c->get('settings');
-        $twig = new Slim\Views\Twig($settings['view']['template_path'], $settings['view']['twig']);
-
-        // Add extensions
-        $twig->addExtension(new Slim\Views\TwigExtension($app->getRouter(), ''));
-        $twig->addExtension(new Twig_Extension_Debug());
-
-        return new \App\Infrastructure\View\TwigView($twig);
+    \App\Infrastructure\View\ViewInterface::class => DI\factory(function (ContainerInterface $c) {
+        return \App\ServiceProviders\TwigServiceProvider::register($c);
     }),
     'view'=> get(\App\Infrastructure\View\ViewInterface::class),
     'flash' => factory(function (ContainerInterface $c) {
         return new Slim\Flash\Messages;
     }),
-    \Psr\Log\LoggerInterface::class => function (ContainerInterface $c) {
-        $settings = $c->get('settings');
-        $logger = new Monolog\Logger($settings['logger']['name']);
-        $logger->pushProcessor(new Monolog\Processor\UidProcessor());
-        $logger->pushHandler(new Monolog\Handler\StreamHandler($settings['logger']['path'], Monolog\Logger::DEBUG));
-        return $logger;
-    },
-    'logger' => get(\Psr\Log\LoggerInterface::class),
-    'db' => factory(function(ContainerInterface $c) {
-        $db = $c->get('settings')['database'];
-        $dsn = "{$db['driver']}:{$db['dbname']}";
-        return new \Pdo($dsn, $db['user'], $db['password']);
+    \Psr\Log\LoggerInterface::class => DI\factory(function (ContainerInterface $c) {
+        return App\ServiceProviders\MonologServiceProvider::register($c);
     }),
-    \PDO::class => get('db'),
-    'repositoryFactory' => function(ContainerInterface $c) {
-        $db = $c->get('db');
+    'logger' => get(\Psr\Log\LoggerInterface::class),
+    \PDO::class => DI\factory(function (ContainerInterface $c) {
+        return \App\ServiceProviders\PDOSQLiteServiceProvider::register($c);
+    }),
+    'db' => get(\PDO::class),
+// factories
+    'repositoryFactory' => function (ContainerInterface $c) {
+        $db = $c->get(\PDO::class);
         $repositoryFactory = new App\Infrastructure\Repository\PDORepositoryFactory($db);
         return $repositoryFactory;
     },
 
-    'validatorFactory' => function(ContainerInterface $c) {
+    'validatorFactory' => function (ContainerInterface $c) {
         $validatorFactory = new App\Validators\ValidatorFactory();
         return $validatorFactory;
     },
 
-    'eventDispatcher' => factory(function($logger) {
+    'eventDispatcher' => factory(function ($logger) {
         return new App\Dispatchers\LoggerEventDispatcher($logger);
     })->parameter('logger', get('logger')),
 
+    \App\Http\Controllers\Test\TestController::class => DI\factory(function (ContainerInterface $c) {
+        return new App\Http\Controllers\Test\TestController($c->get('view'), $c->get('logger'));
+    }),
 
 ];

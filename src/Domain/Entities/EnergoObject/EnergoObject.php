@@ -5,10 +5,7 @@ namespace  Domain\Entities\EnergoObject;
 use Domain\Entities\EventTrait,
     Domain\Enums\ActivityStatus,
     Domain\Enums\Voltage,
-    Domain\Enums\EnergoObjectType,
-    Domain\Entities\User\Events\UserActivatedEvent,
-    Domain\Entities\User\Events\UserDeactivatedEvent,
-    Domain\Exceptions\DomainException;
+    Domain\Enums\EnergoObjectType;
 
 class EnergoObject {
     use EventTrait;
