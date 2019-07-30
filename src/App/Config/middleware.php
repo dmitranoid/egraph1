@@ -3,7 +3,7 @@
 
 use Slim\Middleware\RoutingMiddleware;
 
-$app->add(new RoutingMiddleware($app->getRouteResolver()));
+$app->add(new RoutingMiddleware($app->getRouteResolver(), $app->getRouteCollector()->getRouteParser());
 
 $app->add(
     new Slim\Middleware\ErrorMiddleware(

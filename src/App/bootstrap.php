@@ -48,7 +48,7 @@ if ($console) {
     );
 }
 
-// DI
+ // DI
 $definitions = require APP_DIR . '/Config/dependencies.php';
 $container = (new ContainerBuilder())
     ->useAnnotations(false)
