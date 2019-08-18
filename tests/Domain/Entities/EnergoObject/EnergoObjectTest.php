@@ -16,7 +16,7 @@ class EnergoObjectTest extends TestCase
         $voltage = new Voltage(Voltage::V04);
         $activityStatus = new ActivityStatus(ActivityStatus::ENABLED);
         $type = new EnergoObjectType(EnergoObjectType::TP);
-        $obj = new EnergoObject('TestEnergoObject', $type, $voltage, $activityStatus);
+        $obj = new EnergoObject('TestEnergoObject', 'EO-001', $type, $voltage, $activityStatus);
         $this->assertInstanceOf(EnergoObject::class, $obj);
     }
 }

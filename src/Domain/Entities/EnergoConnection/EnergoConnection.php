@@ -6,9 +6,8 @@ use Domain\Entities\EventTrait,
     Domain\Entities\EnergoObject\EnergoObject,
     Domain\Enums\Voltage,
     Domain\Enums\TransmissionDirection,
-    Domain\Enums\ActivityStatus,
-    Domain\Exceptions\DomainException;
-    
+    Domain\Enums\ActivityStatus;
+
 /**
  * Точка подключения к энергообъекту
  */
@@ -18,17 +17,17 @@ class EnergoConnection {
     private $id;
     private $energoObject;
     private $name;
-    private $nom;
+    private $code;
     private $voltage;
     private $direction;
     private $activityStatus;
 
-    public function __construct($id, EnergoObject $energoObject, string $name, string $nom, Voltage $voltage, TransmissionDirection $direction, ActivityStatus $activityStatus)
+    public function __construct($id, EnergoObject $energoObject, string $name, string $code, Voltage $voltage, TransmissionDirection $direction, ActivityStatus $activityStatus)
     {
         $this->id = $id;
         $this->energoObject = $energoObject;
         $this->name = $name;
-        $this->nom = $nom; 
+        $this->code = $code;
         $this->direction = $direction;
         $this->voltage = $voltage;
     }

@@ -20,15 +20,14 @@ class UserValidatorTest extends TestCase
 
     }
 
-    public function testUserValidator_Wrong_Data() {
-        //не сделан валидатор
-        $data = [
-           'name'=>'', 
-        ];
-        $userValidator = new UserValidator();
-        $result = $userValidator->validate($data);
-
-        $this->assertEquals(['name'=>''], $result);
-
-    }    
+//    public function testUserValidator_Wrong_Data() {
+// не сделан валидатор
+//        $data = [
+//           'name'=>'',
+//        ];
+//        $userValidator = new UserValidator();
+//        $result = $userValidator->validate($data);
+//
+//        $this->assertEquals(['name'=>''], $result, var_export($result, true));
+//    }
 }

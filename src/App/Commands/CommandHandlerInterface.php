@@ -3,7 +3,7 @@
 namespace App\Commands;
 
 
-interface CommandInterface
+interface CommandHandlerInterface
 {
     public function execute();
 }
