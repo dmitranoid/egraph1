@@ -2,15 +2,15 @@
 
 namespace App\Infrastructure\Repository\PDO;
 
-
 use App\Infractructure\Hydrator\HydratorInterface;
+use PDO;
 
 class BasePdoRepository
 {
     /**
      * db handle
      *
-     * @var \PDO
+     * @var PDO
      */
     protected $db;
 
@@ -24,16 +24,18 @@ class BasePdoRepository
     /**
      * constructor
      *
-     * @param \PDO $db
+     * @param PDO $db
      * @param HydratorInterface $hydrator
      * @return void
      */
-    public function __construct(\PDO $db, $hydrator) {
+    public function __construct(PDO $db, $hydrator)
+    {
         $this->db = $db;
         $this->hydrator = $hydrator;
     }
 
-    public function fieldsToParams(array $fields):array {
+    public function fieldsToParams(array $fields): array
+    {
         $result = [];
         foreach ($fields as $field => $value) {
             $result[':'.$field] = $value;

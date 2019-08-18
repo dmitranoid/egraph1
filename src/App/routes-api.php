@@ -1,11 +1,12 @@
 <?php
 
-function responseJsonError(\Psr\Http\Message\ResponseInterface $response, $statusCode = 200, $message = [])
+function responseJsonError(Psr\Http\Message\ResponseInterface $response, $statusCode = 200, $message = [])
 {
     return $response->withStatus($statusCode)->withJson($message);
 }
 
-$app->group('/api/v1/', function (Slim\App $app) {
+$app->group('/api/v1/', function ($app) {
+    /** @var Slim\App $app */
     $ci = $app->getContainer();
 
     $app->any('{class}/{method}', function ($request, $response, $args) use ($ci) {
@@ -26,4 +27,4 @@ $app->group('/api/v1/', function (Slim\App $app) {
         $response = call_user_func($ci->get($className), $request, $response, $args);
         return $response;
     });
-})->add(new \App\Middlewares\CORSMiddleware());
+})->add(new App\Middlewares\CORSMiddleware());

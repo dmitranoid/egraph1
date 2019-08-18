@@ -2,7 +2,6 @@
 
 namespace App\Infrastructure\Repository\Memory;
 
-
 use App\Infractructure\Hydrator\HydratorInterface;
 
 class BaseMemoryRepository
@@ -17,7 +16,8 @@ class BaseMemoryRepository
      * constructor
      * @var HydratorInterface;
      */
-    public function __construct($hydrator) {
+    public function __construct($hydrator)
+    {
         $this->hydrator = $hydrator;
     }
 }

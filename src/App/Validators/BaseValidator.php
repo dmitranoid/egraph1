@@ -14,11 +14,9 @@ class BaseValidator implements ValidatorInterface
             $this->rules = $rules;
         }
         foreach ($this->rules as $field => $rule) {
-            /*
             if (false === ($result = $rule->validate($data[$field]))) {
                 $this->errors[$field] = $result;
             }
-            */
         }
         return empty($this->errors);
     }
