@@ -29,7 +29,7 @@
     "require": {
         "slim/http": "0.5",
         "slim/psr7": "dev-master",
-        "slim/slim": "4.x-dev",        
+      "slim/slim": "^4",
         "slim/twig-view": "^2.0",
         "slim/flash": "^0.1.0",
         "monolog/monolog": "^1.13",
