@@ -15,7 +15,6 @@ class TwigServiceProvider implements ServiceProviderInterface
             'cache' => $config['twig']['cache'],
         ]);
         //$twig->addExtension(new Slim\Views\TwigExtension($app->getRouter(), ''));
-        $twig->addExtension(new \Twig_Extension_Debug());
 
         return new TwigView($twig);
     }

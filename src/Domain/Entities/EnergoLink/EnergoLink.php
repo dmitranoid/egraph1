@@ -20,5 +20,7 @@ class EnergoLink {
     public function __construct(EnergoConnection $srcConnection, EnergoConnection $dstConnection, string $name, $status) {
         $this->srcConnection = $srcConnection;
         $this->dstConnection = $dstConnection;
+        $this->name = $name;
+        $this->status = $status;
     }
 }

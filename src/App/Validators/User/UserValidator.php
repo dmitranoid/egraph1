@@ -9,9 +9,8 @@ class UserValidator extends BaseValidator
 {
     protected $rules = [
         'name' => [
-            'not empty', 
-            ['min_length'=> 3],
-            ['max_length'=> 50],
+            'required',
+            ['lengthBetween', 3, 50],
         ]
     ];
 

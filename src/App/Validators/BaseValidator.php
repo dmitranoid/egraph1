@@ -3,22 +3,33 @@
 namespace App\Validators;
 
 
+
+use Valitron\Validator;
+
 class BaseValidator implements ValidatorInterface
 {
+    /** @var Validator */
+    protected  $validator;
+
     protected $errors = [];
 
     protected $rules = [];
 
+    public function __construct()
+    {
+        $this->validator = new Validator();
+        $this->validator->mapFieldsRules($this->rules);
+    }
+
     public function validate($data, $rules = []) {
+        $this->errors = [];
+        $v2 = $this->validator->withData($data);
         if (!empty($rules)) {
-            $this->rules = $rules;
+            $v2->mapFieldsRules($rules);
         }
-        foreach ($this->rules as $field => $rule) {
-            if (false === ($result = $rule->validate($data[$field]))) {
-                $this->errors[$field] = $result;
-            }
-        }
-        return empty($this->errors);
+        $isValid= $v2->validate();
+        $this->errors = $v2->errors();
+        return $isValid;
     }
 
     public function getErrors() {
