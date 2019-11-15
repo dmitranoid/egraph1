@@ -4,7 +4,7 @@
 namespace App\Commands;
 
 
-class CommandInterface
+interface CommandInterface
 {
 
 }

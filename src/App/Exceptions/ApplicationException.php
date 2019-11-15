@@ -4,7 +4,7 @@
 namespace App\Exceptions;
 
 
-class ApplicationException
+class ApplicationException extends \Exception
 {
 
 }

@@ -18,7 +18,7 @@ class CreateCommandHandler extends GenericCommandHandler
         $this->logger = $logger;
     }
 
-    public function execute()
+    public function handle(CreateCommand $command)
     {
         $this->logger->info('Create Energo Object command ');
     }

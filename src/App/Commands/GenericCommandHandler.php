@@ -11,5 +11,5 @@ namespace App\Commands;
 
 abstract class GenericCommandHandler implements CommandHandlerInterface
 {
-    abstract public function execute();
+//    abstract public function handle(CommandInterface $command);
 }

@@ -4,7 +4,23 @@
 namespace App\Commands\Import\EnergoMesh;
 
 
-class ImportEnergoMeshCommand
+use App\Commands\CommandInterface;
+
+class ImportEnergoMeshCommand implements CommandInterface
 {
+    /**
+     * @var \PDO
+     */
+    public $dstPdo;
+    /**
+     * @var \PDO
+     */
+    public $srcPdo;
+
+    public function __construct(\PDO $srcPdo, \PDO $dstPdo)
+    {
+        $this->dstPdo = $dstPdo;
+        $this->srcPdo = $srcPdo;
+    }
 
 }

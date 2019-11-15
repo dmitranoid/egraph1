@@ -1,11 +1,12 @@
 <?php
 namespace App\Commands\EnergoObject;
 
+use App\Commands\CommandInterface;
 use Domain\Enums\ActivityStatus;
 use Domain\Enums\EnergoObjectType;
 use Domain\Enums\Voltage;
 
-class CreateCommand
+class CreateCommand implements CommandInterface
 {
     /** @var string Наименование объекта */
     private $name;
