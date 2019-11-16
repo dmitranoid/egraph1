@@ -45,22 +45,23 @@ class DwresImportService implements ImportServiceInterface
 
         foreach ($importData as $item) {
 
+            $a = $item;
             // сменилсяРЭС
-            if (strcmp($prevRes, $item['res_name']) != 0) {
-                $prevRes = $item['res_name'];
+            if (strcmp($prevRes, $item['RES_NAME']) != 0) {
+                $prevRes = $item['RES_NAME'];
                 $prevPst = $prevFider = $prevTp = null;
             }
 
             // сменилась ПС
-            if (strcmp($prevPst, $item['pst_name']) != 0) {
+            if (strcmp($prevPst, $item['PST_NAME']) != 0) {
                 try {
                     // new EnergoObject()
                     $this->dstFPdo
                         ->insertInto('energoObject')
                         ->values([
-                            'id_res' => $item['id_res'],
-                            'code' => $item['pst_name'],
-                            'name' => $item['pst_name'],
+                            'id_res' => $item['RES_NAME'],
+                            'code' => $item['PST_NAME'],
+                            'name' => $item['PST_NAME'],
                             'type' => 'ПС',
                             'voltage' => '',
                             'status' => true
@@ -69,20 +70,21 @@ class DwresImportService implements ImportServiceInterface
                 } catch (PDOException $e) {
                     throw new ApplicationException('import Error', 0, $e);
                 }
-                $prevPst = $item['pst_name'];
+                $prevPst = $item['PST_NAME'];
                 $prevFider = $prevTp = null;
             }
 
             // смена фидера
-            if (strcmp($prevFider, $item['fider_name']) != 0) {
+            if (strcmp($prevFider, $item['FIDER_NAME']) != 0) {
                 try {
+                    // точка подключения со стороны ПС
                     // new EnergoConnection()
                     $this->dstFPdo
                         ->insertInto('energoConnection')
                         ->values([
                             'id_energoObject' => $prevPst,
-                            'code' => $item['fider_name'],
-                            'name' => $item['fider_name'],
+                            'code' => $item['FIDER_NAME'],
+                            'name' => $item['PST_NAME'] . '-' . $item['FIDER_NAME'],
                             'voltage' => '',
                             'status' => true
                         ])
@@ -91,8 +93,8 @@ class DwresImportService implements ImportServiceInterface
                     throw new ApplicationException('import Error', 0, $e);
                 }
 
-                $prevFider = $item['fider_name'];
-                $fiderConnection = $item['fider_name']; // fider code
+                $prevFider = $item['FIDER_NAME'];
+                $fiderConnection = $item['FIDER_NAME']; // fider code
                 $prevTp = null;
             }
 
@@ -102,42 +104,41 @@ class DwresImportService implements ImportServiceInterface
                 ->insertInto('energoObject')
                 ->values([
                     'id_res' => $prevRes,
-                    'code' => $item['code_tp'] . '' . $item['tp_name'],
-                    'name' => $item['tp_name'],
-                    'type' => $item['tp_obj_type'],
-                    'voltage' => '',
-                    'activity' => true
-                ])
-                ->execute();
-
-            // точка подключения к ТП
-            // new EnergoConnection()
-            $this->dstFPdo
-                ->insertInto('energoConnection')
-                ->values([
-                    'id_energoObject' =>  $item['code_tp'] . '-' . $item['tp_name'],
-                    'code' => $item['fider_name'],
-                    'name' => $item['tp_name'],
+                    'code' => $item['TP_NAME'],
+                    'name' => $item['TP_NAME'],
+                    'type' => $item['TP_SOBJ_TYPE'],
                     'voltage' => '',
                     'status' => true
                 ])
                 ->execute();
 
-            $tpConnection = $item['code_tp'] . '-' . $item['tp_name'];
+            // точка подключения к ПС со стороны ТП
+            // new EnergoConnection()
+            $this->dstFPdo
+                ->insertInto('energoConnection')
+                ->values([
+                    'id_energoObject' =>$item['TP_NAME'],
+                    'code' => $item['TP_NAME'],
+                    'name' => $item['FIDER_NAME'] . '-' . $item['TP_NAME'] ,
+                    'voltage' => '',
+                    'status' => true
+                ])
+                ->execute();
+
+            $tpConnection = $item['TP_NAME'];
 
             // линия от фидера к ТП
             // new EnergoLink()
             $this->dstFPdo
                 ->insertInto('energoLink')
                 ->values([
-                    'id_srcConnection' => $fiderConnection,
+                    'id_srcConnection' => $fiderConnection ?? '(null)',
                     'id_dstConnection' => $tpConnection,
-                    'code' => $item['code_tp'] . '' . $item['tp_name'],
+                    'code' => $item['FIDER_NAME'] . ' / ' . $item['TP_NAME'],
                     'name' => 'BЛ',
-                    'activity' => true
+                    'status' => true
                 ])
                 ->execute();
         }
-
     }
 }

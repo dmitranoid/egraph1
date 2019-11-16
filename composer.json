@@ -28,6 +28,7 @@
     },
     "require": {
         "ext-pdo": "*",
+        "ext-json": "*",
         "slim/http": "*",
         "slim/psr7": "*",
         "slim/slim": "^4",

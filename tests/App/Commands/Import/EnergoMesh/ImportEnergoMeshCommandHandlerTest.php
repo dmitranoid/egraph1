@@ -3,7 +3,9 @@
 namespace App\Commands\Import\EnergoMesh;
 
 
+use Monolog\Handler\PHPConsoleHandler;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 use Psr\Log\Test\TestLogger;
 
 class ImportEnergoMeshCommandHandlerTest extends TestCase
@@ -18,6 +20,7 @@ class ImportEnergoMeshCommandHandlerTest extends TestCase
             [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]
         );
         $dstPdo = new \PDO('sqlite:F:\wwwork\egraph1\data\data.sqlite3', '', '',  [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]);
+        $dstPdo->exec('PRAGMA journal_mode = MEMORY');
         //$dstPdo = new \PDO('sqlite::memory:', '', '',  [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]);
         $dstPdo->exec('
             CREATE TABLE IF NOT EXISTS energoObject (
@@ -27,7 +30,7 @@ class ImportEnergoMeshCommandHandlerTest extends TestCase
                 name TEXT, 
                 type TEXT, 
                 voltage TEXT, 
-                activity BOOL
+                status BOOL
                 )');
         $dstPdo->exec('
             CREATE TABLE IF NOT EXISTS energoConnection (
@@ -37,7 +40,7 @@ class ImportEnergoMeshCommandHandlerTest extends TestCase
                 name TEXT, 
                 voltage TEXT, 
                 direction TEXT,
-                activity BOOL
+                status BOOL
                 )');
 
         $dstPdo->exec('
@@ -47,11 +50,10 @@ class ImportEnergoMeshCommandHandlerTest extends TestCase
                 id_dstConnection TEXT,
                 code TEXT, 
                 name TEXT, 
-                activity BOOL
+                status BOOL
                 )');
 
-        $commandHandler = new ImportEnergoMeshCommandHandler(new TestLogger());
-        $result = $commandHandler->handle(new ImportEnergoMeshCommand($srcPdo, $dstPdo));
-        $this->assertTrue($result);
+        $commandHandler = new ImportEnergoMeshCommandHandler(new NullLogger());
+        $this->assertNull($commandHandler->handle(new ImportEnergoMeshCommand($srcPdo, $dstPdo)));
     }
 }
