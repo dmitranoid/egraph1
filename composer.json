@@ -27,6 +27,7 @@
         }
     },
     "require": {
+        "ext-json": "*",
         "ext-pdo": "*",
         "ext-json": "*",
         "slim/http": "*",
