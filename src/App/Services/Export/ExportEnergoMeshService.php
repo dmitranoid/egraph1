@@ -23,6 +23,12 @@ final class ExportEnergoMeshService
 
     public function exportCytoscapeJson(): string
     {
+        $substNodes = $this->fpdo
+            ->from('energoObject obj')
+            ->select('obj.name obj_name, obj.type obj_type')
+            ->where('obj_type', 'ПС')
+            ->fetchAll();
+
         $nodes = $this->fpdo
             ->from('energoConnection conn')
             ->join('energoObject obj on conn.id_energoObject = obj.code')
@@ -32,13 +38,28 @@ final class ExportEnergoMeshService
             ->from('energoLink')
             ->fetchAll();
 
-        $cytoscapeData = [
-        ];
-
-        foreach ($nodes as $node) {
+        $cytoscapeData = [];
+        // подстанции
+        foreach ($substNodes as $node) {
             $cytoscapeData[] = [
-                'data' => ['id' => $node['conn_code']]
+                'data' => ['id' => $node['obj_name']]
             ];
+        }
+        //
+        foreach ($nodes as $node) {
+            $cytoscapeData[] = ['data' => [
+                'id' => $node['conn_code'],
+//                    'parent' => $node['id_energoObject'],
+            ]
+            ];
+            // если не фидер, а точка подключения в ТП
+            if ($node['obj_name'] != $node['conn_code']) {
+                $cytoscapeData[] = ['data' => [
+                    'id' => $node['obj_name'] . '/' . $node['code'],
+                    'source' => $node['obj_name'],
+                    'target' => $node['conn_code'],
+                ]];
+            }
         }
 
         foreach ($edges as $edge) {
@@ -50,8 +71,7 @@ final class ExportEnergoMeshService
                 ]
             ];
         }
-
-        return json_encode($cytoscapeData, JSON_PRETTY_PRINT);
+        return json_encode($cytoscapeData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 
 }
