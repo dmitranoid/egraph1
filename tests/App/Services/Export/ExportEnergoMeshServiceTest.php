@@ -1,20 +1,22 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Services\Export;
+namespace Test\App\Services\Export;
 
 
+use App\Services\Export\ExportEnergoMeshService;
+use PDO;
 use PHPUnit\Framework\TestCase;
 
 class ExportEnergoMeshServiceTest extends TestCase
 {
-    /** @var \PDO */
+    /** @var PDO */
     protected $pdo;
 
     protected function setUp():void
     {
         parent::setUp();
-        $this->pdo = new \PDO('sqlite:F:\wwwork\egraph1\data\data.sqlite3', '', '',  [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]);
+        $this->pdo = new PDO('sqlite:..\..\..\..\data\data.sqlite3', '', '', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
         $this->pdo->exec('PRAGMA journal_mode = MEMORY');
     }
 
@@ -22,7 +24,7 @@ class ExportEnergoMeshServiceTest extends TestCase
     {
         $service =  new ExportEnergoMeshService($this->pdo);
         $result = $service->exportCytoscapeJson();
-        $this->assertJson($result);
+        $this->assertIsArray($result);
     }
 
 }

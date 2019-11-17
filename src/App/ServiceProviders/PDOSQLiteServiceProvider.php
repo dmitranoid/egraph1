@@ -3,6 +3,7 @@
 namespace App\ServiceProviders;
 
 
+use PDO;
 use Psr\Container\ContainerInterface;
 
 class PDOSQLiteServiceProvider implements ServiceProviderInterface
@@ -11,7 +12,9 @@ class PDOSQLiteServiceProvider implements ServiceProviderInterface
     {
         $db = $container->get('settings')['database'];
         $dsn = "{$db['driver']}:{$db['dbname']}";
-        return new \PDO($dsn, $db['user'], $db['password']);
+        $pdo = new PDO($dsn, $db['user'], $db['password']);
+        $pdo->exec('PRAGMA journal_mode = MEMORY');
+        return $pdo;
     }
 
 }

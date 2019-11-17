@@ -1,32 +1,44 @@
 <?php
 
-namespace App\Commands\Import\EnergoMesh;
+namespace Test\App\Commands\Import\EnergoMesh;
 
 
-use Monolog\Handler\PHPConsoleHandler;
+use App\Commands\Import\EnergoMesh\ImportEnergoMeshCommand;
+use App\Commands\Import\EnergoMesh\ImportEnergoMeshCommandHandler;
+use PDO;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
-use Psr\Log\Test\TestLogger;
 
 class ImportEnergoMeshCommandHandlerTest extends TestCase
 {
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testHandle()
     {
 
-        $srcHost = 'firebird:dbname=localhost:f:\wwwork\egraph_import_data\dwres2\gan.FDB;charset=UTF8'; // charset=WIN1251
-        $srcPdo = new \PDO(
+        $srcHost = 'firebird:dbname=localhost:d:\work\egraph-test-data\fdb\gan.FDB;charset=UTF8';
+        $srcPdo = new PDO(
             $srcHost,
             'sysdba', 'masterkey',
-            [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]
+            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
         );
-        $dstPdo = new \PDO('sqlite:F:\wwwork\egraph1\data\data.sqlite3', '', '',  [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]);
+        $dstPdo = new PDO('sqlite:..\..\..\..\..\data\data.sqlite3', '', '', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
         $dstPdo->exec('PRAGMA journal_mode = MEMORY');
         //$dstPdo = new \PDO('sqlite::memory:', '', '',  [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]);
         $dstPdo->exec('
+        CREATE TABLE IF NOT EXISTS region
+        (
+            id integer not null constraint region_pk primary key autoincrement,
+            code text not null,
+            name text
+        )');
+
+        $dstPdo->exec('
             CREATE TABLE IF NOT EXISTS energoObject (
                 id INTEGER PRIMARY KEY, 
-                id_res TEXT,
-                code TEXT, 
+                code_region TEXT,
+                code TEXT not null, 
                 name TEXT, 
                 type TEXT, 
                 voltage TEXT, 
@@ -35,7 +47,7 @@ class ImportEnergoMeshCommandHandlerTest extends TestCase
         $dstPdo->exec('
             CREATE TABLE IF NOT EXISTS energoConnection (
                 id INTEGER PRIMARY KEY, 
-                id_energoObject TEXT,
+                code_energoObject TEXT,
                 code TEXT, 
                 name TEXT, 
                 voltage TEXT, 
@@ -46,14 +58,15 @@ class ImportEnergoMeshCommandHandlerTest extends TestCase
         $dstPdo->exec('
             CREATE TABLE IF NOT EXISTS energoLink (
                 id INTEGER PRIMARY KEY, 
-                id_srcConnection TEXT,
-                id_dstConnection TEXT,
+                code_srcConnection TEXT,
+                code_dstConnection TEXT,
+                code_region TEXT,
                 code TEXT, 
                 name TEXT, 
                 status BOOL
                 )');
 
         $commandHandler = new ImportEnergoMeshCommandHandler(new NullLogger());
-        $this->assertNull($commandHandler->handle(new ImportEnergoMeshCommand($srcPdo, $dstPdo)));
+        $commandHandler->handle(new ImportEnergoMeshCommand($srcPdo, $dstPdo));
     }
 }

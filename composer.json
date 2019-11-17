@@ -27,7 +27,6 @@
         }
     },
     "require": {
-        "ext-json": "*",
         "ext-pdo": "*",
         "ext-json": "*",
         "slim/http": "*",
@@ -38,10 +37,10 @@
         "monolog/monolog": "^1.13",
         "php-di/php-di": "^6.0",
         "vlucas/phpdotenv": "^2.4",
+      "vlucas/valitron": "^1.4",
         "ramsey/uuid": "^3.7",
         "myclabs/php-enum": "^1.5",
         "psr/cache": "^1.0",
-        "vlucas/valitron": "^1.4",
         "envms/fluentpdo": "^2.1"
     },
     "require-dev": {
