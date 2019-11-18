@@ -29,6 +29,10 @@ final class DipolImportService implements ImportServiceInterface
     {
         $this->srcFPdo = new Query($srcPdo);
         $this->dstFPdo = new Query($dstPdo);
+        // TODO костыль sqlite3 uppercase
+        $dstPdo->sqliteCreateFunction('php_upper', function($string){return mb_strtoupper($string);}, 1);
+        $dstPdo->sqliteCreateFunction('php_lower', function($string){return mb_strtolower($string);}, 1);
+
         $this->logger = $logger;
     }
 
@@ -48,7 +52,7 @@ final class DipolImportService implements ImportServiceInterface
             $substationForUpdate = $this->dstFPdo
                 ->from('energoObject')
                 ->where('type', 'ПС')
-                ->where('name', $substation['P_NAME'])
+                ->where('php_upper(name)', strtoupper($substation['P_NAME']))
                 ->select('code_region, code, name')
                 ->fetch();
             if (!empty($substationForUpdate)) {
