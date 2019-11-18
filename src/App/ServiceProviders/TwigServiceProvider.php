@@ -4,18 +4,14 @@ namespace App\ServiceProviders;
 
 use Psr\Container\ContainerInterface;
 use App\Infrastructure\View\TwigView;
+use Slim\Views\Twig;
 
 class TwigServiceProvider implements ServiceProviderInterface
 {
     public static function register(ContainerInterface $container)
     {
-        $config = $container->get('settings')['view'];
-        $loader = new \Twig\Loader\FilesystemLoader($config['template_path']);
-        $twig = new \Twig\Environment($loader, [
-            'cache' => $config['twig']['cache'],
-        ]);
-        //$twig->addExtension(new Slim\Views\TwigExtension($app->getRouter(), ''));
-
-        return new TwigView($twig);
+        $settings = $container->get('settings')['view'];
+        $twigSettings = $settings['twig'];
+        return new TwigView(new Twig($settings['template_path'], $twigSettings));
     }
 }

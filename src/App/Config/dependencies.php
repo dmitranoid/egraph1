@@ -2,28 +2,33 @@
 
 // php-di configuration
 
+use App\Infrastructure\View\ViewInterface;
+use App\ServiceProviders\PDOSQLiteServiceProvider;
+use App\ServiceProviders\TwigServiceProvider;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 use function DI\create;
 use function DI\get;
 use function DI\factory;
+
 
 return [
 // Settings
     'settings' => require APP_DIR . '/Config/settings.php',
 // Service providers
-    \App\Infrastructure\View\ViewInterface::class => DI\factory(function (ContainerInterface $c) {
-        return \App\ServiceProviders\TwigServiceProvider::register($c);
+    ViewInterface::class => DI\factory(function (ContainerInterface $c) {
+        return TwigServiceProvider::register($c);
     }),
-    'view'=> get(\App\Infrastructure\View\ViewInterface::class),
+    'view'=> get(ViewInterface::class),
     'flash' => factory(function (ContainerInterface $c) {
         return new Slim\Flash\Messages;
     }),
-    \Psr\Log\LoggerInterface::class => DI\factory(function (ContainerInterface $c) {
+    LoggerInterface::class => DI\factory(function (ContainerInterface $c) {
         return App\ServiceProviders\MonologServiceProvider::register($c);
     }),
-    'logger' => get(\Psr\Log\LoggerInterface::class),
+    'logger' => get(LoggerInterface::class),
     \PDO::class => DI\factory(function (ContainerInterface $c) {
-        return \App\ServiceProviders\PDOSQLiteServiceProvider::register($c);
+        return PDOSQLiteServiceProvider::register($c);
     }),
     'db' => get(\PDO::class),
 // factories
@@ -42,8 +47,9 @@ return [
         return new App\Dispatchers\LoggerEventDispatcher($logger);
     })->parameter('logger', get('logger')),
 
-    \App\Http\Controllers\Test\TestController::class => DI\factory(function (ContainerInterface $c) {
-        return new App\Http\Controllers\Test\TestController($c->get('view'), $c->get('logger'));
-    }),
+    \Slim\Interfaces\RouteParserInterface::class => factory(function (ContainerInterface $c) {
+
+        return app()->getRouteCollector()->getRouteParser();
+    })
 
 ];

@@ -6,9 +6,14 @@ namespace App\Services\Export;
 
 use Envms\FluentPDO\Query;
 use PDO;
+use Webmozart\Assert\Assert;
 
 final class ExportEnergoMeshService
 {
+    const NETWORK_LEVEL_HIGH = 'h';
+    const NETWORK_LEVEL_LOW = 'l';
+
+    const HIGH_VOLTAGE = [110, 220, 330, 750];
 
     /**
      * @var Query
@@ -20,27 +25,71 @@ final class ExportEnergoMeshService
         $this->fpdo = new Query($pdo);
     }
 
-
-    public function exportCytoscapeJson(): array
+    /**
+     * @param null $region код региона обслуживающиго сети
+     * @param null $level уровень сети (основная(high)/распределительная(low))
+     * @return array
+     */
+    public function exportCytoscapeJson($region = null, $level = null): array
     {
+        return $this->getMesh($region, $level);
+    }
+
+    public function getMesh($region = null, $level = null): array
+    {
+        // для распредсети все равно показываем и основную
+        if (empty($level)) {
+            $level = self::NETWORK_LEVEL_LOW;
+        }
+        Assert::true($level == self::NETWORK_LEVEL_LOW || $level == self::NETWORK_LEVEL_HIGH, 'неправильно задан уровень сети');
+
         $substNodes = $this->fpdo
             ->from('energoObject obj')
-            ->select('obj.name obj_name, obj.type obj_type')
-            ->where('obj_type', 'ПС')
+            ->select('obj.name obj_name, obj.type obj_type, obj.voltage obj_voltage')
+            ->where('obj_type', 'ПС');
+        if (!empty($region)) {
+            $substNodes->where('obj.code_region', $region);
+        }
+        if ($level == self::NETWORK_LEVEL_HIGH) {
+            $substNodes->where('obj.voltage', self::HIGH_VOLTAGE);
+        }
+        $substNodes = $substNodes
             ->fetchAll();
 
         $nodes = $this->fpdo
             ->from('energoConnection conn')
             ->join('energoObject obj on conn.code_energoObject = obj.code')
             ->select('conn.id conn_id, conn.name conn_name, conn.code conn_code, obj.name obj_name, obj.type obj_type')
-            ->order('conn.voltage desc')
-            ->fetchAll();
+            ->order('conn.voltage desc');
+        if (!empty($region)) {
+            $nodes->where('obj.code_region', $region);
+        };
+        // TODO неясно, нужно ли скрывать отходящие фидеры 10КВ
+        if ($level == self::NETWORK_LEVEL_HIGH) {
+            $nodes->where('obj.voltage', self::HIGH_VOLTAGE);
+            //$nodes->where('conn.voltage', self::HIGH_VOLTAGE);
+        }
+        $nodes = $nodes->fetchAll();
+
         $edges = $this->fpdo
             ->from('energoLink')
-            ->fetchAll();
+            ->innerJoin('energoConnection srcConn on srcConn.code = code_srcConnection ')
+            ->innerJoin('energoConnection dstConn on dstConn.code = code_dstConnection ')
+            ->select('energoLink.*, srcConn.voltage src_voltage, dstConn.voltage dst_voltage');
+        if (!empty($region)) {
+            $edges->where('code_region', $region);
+        };
+        if ($level == self::NETWORK_LEVEL_HIGH) {
+            // TODO возможно здесь тоже надо дойти до обьекта по напряжению
+            $edges->where([
+                'src_voltage'=> self::HIGH_VOLTAGE,
+                'dst_voltage'=> self::HIGH_VOLTAGE,
+            ]);
+        }
+        $edges = $edges->fetchAll();
 
         $cytoscapeData = [];
-        // отображаем высокие подстанции как узлы
+        // отображаем высокие подстанции как пс + фидеры (точки подключения)
         // ТП/РП отображаем только как точки подключения для экономии места на схеме
         foreach ($substNodes as $node) {
             $cytoscapeData[] = [

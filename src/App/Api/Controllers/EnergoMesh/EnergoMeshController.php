@@ -9,6 +9,7 @@ use App\Services\Export\ExportEnergoMeshService;
 use PDO;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 final class EnergoMeshController
 
@@ -27,10 +28,34 @@ final class EnergoMeshController
         $this->pdo = $pdo;
     }
 
-    public function all(RequestInterface $request, ResponseInterface $response, array $args)
+    public function all(ServerRequestInterface $request, ResponseInterface $response, array $args)
     {
+        $query = $request->getQueryParams();
+        $region = $query['region'] ?? null;
         $exportService = new ExportEnergoMeshService($this->pdo);
-        $data = $exportService->exportCytoscapeJson();
+        $data = $exportService->exportCytoscapeJson($region);
         return $response->withJson($data);
     }
+
+    public function highNetworks(RequestInterface $request, ResponseInterface $response, array $args)
+    {
+        $query = $request->getQueryParams();
+        $region = $query['region'] ?? null;
+        $exportService = new ExportEnergoMeshService($this->pdo);
+        $data = $exportService->exportCytoscapeJson($region, ExportEnergoMeshService::NETWORK_LEVEL_HIGH);
+        return $response->withJson($data);
+
+    }
+
+    public function lowNetworks(RequestInterface $request, ResponseInterface $response, array $args)
+    {
+        $query = $request->getQueryParams();
+        $region = $query['region'] ?? null;
+        $exportService = new ExportEnergoMeshService($this->pdo);
+        $data = $exportService->exportCytoscapeJson($region, ExportEnergoMeshService::NETWORK_LEVEL_LOW);
+        return $response->withJson($data);
+
+    }
+
+
 }

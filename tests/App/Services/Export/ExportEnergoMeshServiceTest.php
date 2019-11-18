@@ -20,11 +20,26 @@ class ExportEnergoMeshServiceTest extends TestCase
         $this->pdo->exec('PRAGMA journal_mode = MEMORY');
     }
 
-    public function testExportCytoscapeJson(): string
+    public function testGetMeshRegion()
     {
         $service =  new ExportEnergoMeshService($this->pdo);
-        $result = $service->exportCytoscapeJson();
+        $result = $service->getMesh('51400');
         $this->assertIsArray($result);
+    }
+
+    public function testGetMeshLevel()
+    {
+        $service =  new ExportEnergoMeshService($this->pdo);
+        $result = $service->getMesh(null, ExportEnergoMeshService::NETWORK_LEVEL_HIGH);
+        $this->assertIsArray($result);
+        $this->assertNotEmpty($result);
+    }
+
+    public function testGetMeshWrongLevel()
+    {
+        $service =  new ExportEnergoMeshService($this->pdo);
+        $this->expectException(\InvalidArgumentException::class);
+        $result = $service->getMesh(null, 'abs');
     }
 
 }

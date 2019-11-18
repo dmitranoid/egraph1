@@ -17,19 +17,19 @@ if(!function_exists('ddie')) {
 }
 
 // app helpers
-
-if(!function_exists('container')) {
-    function container() {
+if(!function_exists('app')) {
+    function app() {
+        /** @var \Slim\App $app */
+        global $app;
         return $app;
     }
 }
 
 if(!function_exists('container')) {
     function container() {
-        return $app->getContainer();
+        return app()->getContainer();
     }
 }
-
 
 if(!function_exists('info')) {
     function info($message) {

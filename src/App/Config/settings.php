@@ -2,7 +2,7 @@
 return [
     // View settings
     'view' => [
-        'template_path' => SERVER_ROOT_DIR . '/templates',
+        'template_path' => ROOT_DIR . '/templates',
         'twig' => [
             'cache' => ROOT_DIR . '/storage/cache/twig',
             'debug' => true,

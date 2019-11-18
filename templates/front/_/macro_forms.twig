@@ -1,0 +1,63 @@
+{% macro input(label, name, value, type, attr='') %}
+<div class="form-group">
+    <label class="form-label text-bold" for="{{ name }}" >{{ label }}</label>
+    <input class="form-input {% if type == 'date' %}datepicker{% endif %}" id="{{ name }}" name="{{ name }}"
+           value="{{ value }}" type="{{ type }}" {{ attr|raw }}>
+</div>
+{% endmacro %}
+
+{% macro hidden(name, value) %}
+<input id="{{ name }}" type="hidden" name="{{ name }}" value="{{ value }}" >
+{% endmacro %}
+
+{% macro submit(value, attr='') %}
+    <input type="submit" value="{% if value is empty %}Сохранить{% else %} {{ value }} {% endif %}"
+           class="btn btn-primary" {{ attr }}>
+{% endmacro %}
+
+{% macro select(label, name, value, list, attr='') %}
+<div class="form-group">
+    <label class="form-label text-bold" for="{{ name }}" >{{ label }}</label>
+    <select class="form-select" name="{{ name }}" {{ attr|raw }}>
+    {% for listkey, listname in list %}
+        <option value="{{ listkey }}" {% if (listkey == value) %}selected{% endif %} >{{ listname }}</option>
+    {% endfor %}
+    </select>
+</div>
+{% endmacro %}
+
+{% macro select_arr(label, name, value, list) %}
+    <div class="form-group">
+        <label class="form-label text-bold" for="{{ name }}" >{{ label }}</label>
+        <select class="form-select" name="{{ name }}">
+            {% for listkey, listname in list %}
+                <option value="{{ listname }}" {% if (listname == value) %}selected{% endif %} >{{ listname }}</option>
+            {% endfor %}
+        </select>
+    </div>
+{% endmacro %}
+
+{% macro inputChips(label, name, value, autocompletePlaceholder) %}
+    {% import _self as forms %}
+    <div class="form-group">
+        {{ forms.hidden(name, value) }}
+        <label class="form-label text-bold" for="{{ name }}-input">{{ label }}</label>
+        <div class="form-autocomplete">
+            <div class="form-autocomplete-input form-input">
+                <!-- chips -->
+                <!-- autocomplete real input box -->
+                <input class="form-input" id="{{ name }}-input" autocomplete="on" value=""
+                       placeholder="{{ autocompletePlaceholder }}">
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro checkbox(label, name, value, attr='') %}
+    <div class="form-group">
+        <label class="form-checkbox">
+            <input type="checkbox" name="{{ name }}" {% if value %}checked{% endif %}" {{ attr }}>
+            <i class="form-icon"></i> {{ label }}
+        </label>
+    </div>
+{% endmacro %}

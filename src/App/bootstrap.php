@@ -5,6 +5,7 @@ use Slim\App;
 use Slim\Factory\AppFactory;
 use Dotenv\Dotenv;
 use Slim\Http\Environment;
+use Slim\Interfaces\RouteParserInterface;
 
 define('APP_DIR', realpath(__DIR__));
 define('ROOT_DIR', realpath(__DIR__.'/../..'));
@@ -58,6 +59,10 @@ $container = (new ContainerBuilder())
 
 AppFactory::setContainer($container);
 $app = AppFactory::create();
+
+// костыль для передачи роутинга в контроллеры,
+// вынесено сюда, т.к. нет доступа к $app во время создания контейнера
+//$container->set(RouteParserInterface::class, $app->getRouteCollector()->getRouteParser());
 
 // Debug helpers
 require APP_DIR . '/Helpers/DebugFunctions.php';
