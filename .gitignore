@@ -4,4 +4,5 @@ storage/cache/
 .idea/
 .vscode/
 .env
+!distr.env
 composer.lock
