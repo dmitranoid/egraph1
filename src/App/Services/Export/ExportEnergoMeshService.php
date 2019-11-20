@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Services\Export;
 
 
+use App\Helpers\GeoDataHelper;
 use Envms\FluentPDO\Query;
 use PDO;
 use Webmozart\Assert\Assert;
@@ -13,7 +14,7 @@ final class ExportEnergoMeshService
     const NETWORK_LEVEL_HIGH = 'h';
     const NETWORK_LEVEL_LOW = 'l';
 
-    const HIGH_VOLTAGE = [110, 220, 330, 750];
+    const HIGH_VOLTAGE = [35, 110, 220, 330, 750];
 
     /**
      * @var Query
@@ -26,14 +27,15 @@ final class ExportEnergoMeshService
     }
 
     /**
-     * @param null $region код региона обслуживающиго сети
-     * @param null $level уровень сети (основная(high)/распределительная(low))
+     * @param string|array $region код(ы) РЭСа, обслуживающиго сети
+     * @param string $level уровень сети (основная(high)/распределительная(low))
      * @return array
      */
     public function exportCytoscapeJson($region = null, $level = null): array
     {
         return $this->getMesh($region, $level);
     }
+
 
     public function getMesh($region = null, $level = null): array
     {
@@ -45,7 +47,8 @@ final class ExportEnergoMeshService
 
         $substNodes = $this->fpdo
             ->from('energoObject obj')
-            ->select('obj.name obj_name, obj.type obj_type, obj.voltage obj_voltage')
+            ->leftJoin('geoCoords geo on geo.code_energoObject = obj.code')
+            ->select('obj.name obj_name, obj.type obj_type, obj.voltage obj_voltage, latitude, longitude')
             ->where('obj_type', 'ПС');
         if (!empty($region)) {
             $substNodes->where('obj.code_region', $region);
@@ -56,6 +59,7 @@ final class ExportEnergoMeshService
         $substNodes = $substNodes
             ->fetchAll();
 
+        //
         $nodes = $this->fpdo
             ->from('energoConnection conn')
             ->join('energoObject obj on conn.code_energoObject = obj.code')
@@ -82,12 +86,21 @@ final class ExportEnergoMeshService
         if ($level == self::NETWORK_LEVEL_HIGH) {
             // TODO возможно здесь тоже надо дойти до обьекта по напряжению
             $edges->where([
-                'src_voltage'=> self::HIGH_VOLTAGE,
-                'dst_voltage'=> self::HIGH_VOLTAGE,
+                'src_voltage' => self::HIGH_VOLTAGE,
+                'dst_voltage' => self::HIGH_VOLTAGE,
             ]);
         }
         $edges = $edges->fetchAll();
 
+        $geoHelper = new GeoDataHelper(
+            [
+                'lefttop' => ['latitude' => 53.350, 'longitude' => 24.650],
+                'rightbottom' => ['latitude' => 52.300, 'longitude' => 27.000],
+            ],
+            [
+                'width' => 1920,
+                'height' => 1080
+            ]);
         $cytoscapeData = [];
         // отображаем высокие подстанции как пс + фидеры (точки подключения)
         // ТП/РП отображаем только как точки подключения для экономии места на схеме
@@ -98,7 +111,8 @@ final class ExportEnergoMeshService
                     'caption' => $node['obj_name'],
                     'type' => 'ПС',
                     'weight' => 110,
-                ]
+                ],
+                'position' => $geoHelper->coords2pixels($node['latitude'], $node['longitude']),
             ];
         }
         // точки подключения как узлы
@@ -108,7 +122,6 @@ final class ExportEnergoMeshService
                 'caption' => $node['conn_name'],
                 'type' => $node['obj_type'] == 'ПС' ? 'Ф' : $node['obj_type'],
                 'weight' => in_array($node['obj_type'], ['ТП', 'РП']) ? 0.6 : 110,
-                //'parent' => $node['id_energoObject'],
             ]];
             // если это фидер, то строим связь с ПС
             // у точки подключения к ТП имя точки подключения = имя родительского обьекта

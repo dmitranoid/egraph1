@@ -17,7 +17,7 @@ class ImportEnergoMeshCommandHandlerTest extends TestCase
     public function testHandle()
     {
 
-        $srcHost = 'firebird:dbname=localhost:f:\wwwork\egraph_import_data\dwres2\iva.fdb;charset=UTF8';
+        $srcHost = 'firebird:dbname=localhost:f:\wwwork\egraph_import_data\dwres2\lah.fdb;charset=UTF8';
         $srcPdo = new PDO(
             $srcHost,
             'sysdba', 'masterkey',

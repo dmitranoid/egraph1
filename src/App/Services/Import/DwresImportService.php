@@ -8,6 +8,7 @@ use App\Exceptions\ApplicationException;
 use Envms\FluentPDO\Query;
 use PDO;
 use PDOException;
+use Psr\Log\LoggerInterface;
 
 class DwresImportService implements ImportServiceInterface
 {
@@ -18,10 +19,14 @@ class DwresImportService implements ImportServiceInterface
     /** @var Query */
     private $dstFPdo;
 
-    public function __construct(PDO $srcPdo, PDO $dstPdo)
+    /** @var LoggerInterface */
+    private $logger;
+
+    public function __construct(PDO $srcPdo, PDO $dstPdo, LoggerInterface $logger)
     {
         $this->srcFPdo = new Query($srcPdo);
         $this->dstFPdo = new Query($dstPdo);
+        $this->logger = $logger;
     }
 
     public function doFullImport()
@@ -40,22 +45,27 @@ class DwresImportService implements ImportServiceInterface
             if (empty($region['RES_CODE'])) {
                 throw new ApplicationException('не задан код РЭС для ' . implode('/', [$region['ENERGOSYS_NAME'], $region['FILIAL_NAME'], $region['RES_NAME']]));
             }
-            $resExists = $this->dstFPdo
-                ->from('region')
-                ->where('code', $region['RES_CODE'])
-                ->count();
-            if (!$resExists) {
-                $this->dstFPdo
-                    ->insertInto('region')
-                    ->values([
-                        'code' => $region['RES_CODE'],
-                        'name' => implode('/', [$region['ENERGOSYS_NAME'], $region['FILIAL_NAME'], $region['RES_NAME']]),
-                    ])->execute();
-            }
+
+            // не вставляем, эти данные есть в бд ГПО
+            /*
+                        $resExists = $this->dstFPdo
+                            ->from('region')
+                            ->where('code', $region['RES_CODE'])
+                            ->count();
+                        if (!$resExists) {
+                            $this->dstFPdo
+                                ->insertInto('region')
+                                ->values([
+                                    'code' => $region['RES_CODE'],
+                                    'name' => implode('/', [$region['ENERGOSYS_NAME'], $region['FILIAL_NAME'], $region['RES_NAME']]),
+                                ])->execute();
+                        }
+            */
+
             // удаляем данные РЭСа
             // связи
             $this->dstFPdo
-                ->deleteFrom('energoLink')
+                ->deleteFrom('main.energoLink')
                 ->where('code_region', $region['RES_CODE'])
                 ->execute();
             //точки подключения
@@ -75,6 +85,7 @@ class DwresImportService implements ImportServiceInterface
                 ->execute();
         }
 
+        // выбираем  ПС - фидер - ТП/РП
         $importData = $this->srcFPdo
             ->from('res')
             ->innerJoin('pst on pst.id_res = res.id')
@@ -86,35 +97,42 @@ class DwresImportService implements ImportServiceInterface
             ->select('tp.id id_tp, tp.name tp_name, tp.obj_type tp_obj_type, tp.sobj_type tp_sobj_type, tp.code_tp')
             ->order('res.id, res.id_filial, pst.id, fider.id, tp.id');
 
-        $prevRes = $prevPst = $prevFider = $prevTp = null;
+        $prevRes = $prevPst = $prevPstCode = $prevFider = $prevTp = null;
 
         foreach ($importData as $item) {
 
-            // сменилсяРЭС
+            // сменился РЭС
             if (strcmp($prevRes, $item['RES_CODE']) != 0) {
                 $prevRes = $item['RES_CODE'];
-                $prevPst = $prevFider = $prevTp = null;
+                $prevPst = $prevPstCode = $prevFider = $prevTp = null;
             }
 
             // сменилась ПС
             if (strcmp($prevPst, $item['PST_NAME']) != 0) {
+                $substationGpo = $this->substationGpoGetByName($item['PST_NAME']);
+                if (empty($substationGpo)) {
+                    $this->logger->error(sprintf('ПС %s не найдена в справочнике ГПО', $item['PST_NAME']));
+                    continue;
+                }
+                $prevPst = $item['PST_NAME'];
+                $prevPstCode = $substationGpo['code'];
+                // new EnergoObject()
                 try {
-                    // new EnergoObject()
                     $this->dstFPdo
                         ->insertInto('energoObject')
                         ->values([
-                            'code_region' => $item['RES_CODE'],
-                            'code' => $item['PST_NAME'],
-                            'name' => $item['PST_NAME'],
-                            'type' => 'ПС',
-                            'voltage' => '',
+                            'code_region' => $prevRes,
+                            'code' => $prevPstCode,
+                            'name' => $substationGpo['name'],
+                            'type' => $substationGpo['type'],
+                            'voltage' => $substationGpo['u'],
                             'status' => true
                         ])
                         ->execute();
                 } catch (PDOException $e) {
-                    throw new ApplicationException('import Error', 0, $e);
+                    throw new ApplicationException('ошибка при импорте из dwres', 0, $e);
                 }
-                $prevPst = $item['PST_NAME'];
+
                 $prevFider = $prevTp = null;
             }
 
@@ -126,7 +144,7 @@ class DwresImportService implements ImportServiceInterface
                     $this->dstFPdo
                         ->insertInto('energoConnection')
                         ->values([
-                            'code_energoObject' => $prevPst,
+                            'code_energoObject' => $prevPstCode,
                             'code' => $item['FIDER_NAME'],
                             'name' => $item['PST_NAME'] . '-' . $item['FIDER_NAME'],
                             'voltage' => '',
@@ -171,7 +189,7 @@ class DwresImportService implements ImportServiceInterface
 
             $tpConnection = $item['TP_NAME'];
 
-            // линия от фидера к ТП
+            // фидер к ТП
             // new EnergoLink()
             $this->dstFPdo
                 ->insertInto('energoLink')
@@ -185,7 +203,17 @@ class DwresImportService implements ImportServiceInterface
                 ])
                 ->execute();
         }
+        // сжимаем TODO только для sqlite !!!
+//        $this->dstFPdo->getPDO()->exec('VACUUM');
+    }
 
-        $this->dstFPdo->getPDO()->exec('VACUUM');
+    private function substationGpoGetByName($substationName): ?array
+    {
+        $query = $this->dstFPdo
+            ->from('gpo.gpops')
+            ->select('*', true)
+            ->where('name', mb_strtoupper($substationName));
+        $substation = $query->fetch();
+        return is_array($substation) ? $substation : null;
     }
 }
