@@ -29,7 +29,7 @@ class DwresImportService implements ImportServiceInterface
         $this->logger = $logger;
     }
 
-    public function doFullImport()
+    public function import()
     {
         // TODO удалить старые данные ???
 
@@ -110,14 +110,14 @@ class DwresImportService implements ImportServiceInterface
             // сменилась ПС
             if (strcmp($prevPst, $item['PST_NAME']) != 0) {
 
-                $substationGpo = $this->substationGpoGetByName($item['PST_NAME']);
+                $substationGpo = $this->substationGpoByName($item['PST_NAME']);
 
                 $prevPst = $item['PST_NAME'];
                 $prevPstCode = $substationGpo['code'];
 
                 if (empty($substationGpo)) {
                     // если не нашли, пропускаем вставку
-                    $this->logger->error(sprintf('ПС \'%s\' не найдена в справочнике ГПО', $item['PST_NAME']));
+                    $this->logger->error(sprintf('ПС \'%s\' не найдена в справочнике ОДУ', $item['PST_NAME']));
                     continue;
                 }
                 $prevPst = $item['PST_NAME'];
@@ -211,7 +211,7 @@ class DwresImportService implements ImportServiceInterface
         }
     }
 
-    private function substationGpoGetByName($substationName): ?array
+    private function substationGpoByName($substationName): ?array
     {
         $query = $this->dstFPdo
             ->from('gpo.gpops')

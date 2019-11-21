@@ -35,7 +35,7 @@ class DwresImportServiceTest extends TestCase
     {
         $logger = new TestLogger();
         $dwresImportService = new DwresImportService($this->srcPdo, $this->dstPdo, $logger);
-        $dwresImportService->doFullImport();
+        $dwresImportService->import();
         var_dump($logger);
     }
 }

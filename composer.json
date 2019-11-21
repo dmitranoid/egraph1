@@ -24,7 +24,10 @@
       "App\\": "src/App",
       "Domain\\": "src/Domain",
       "Tests\\": "tests"
-    }
+    },
+    "files": [
+      "tests/App/includes/startup-helpers.php"
+    ]
   },
   "require": {
     "ext-pdo": "*",
