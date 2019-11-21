@@ -53,7 +53,7 @@ class DipolImportServiceTest extends TestCase
         $dipolImportService = new DipolImportService($this->srcPdo, $this->dstPdo, $logger);
         $dipolImportService->updateGeoCoords();
 
-        var_dump($logger);
+        var_dump($logger->recordsByLevel['error']);
 
     }
 

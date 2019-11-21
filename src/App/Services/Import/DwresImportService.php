@@ -85,7 +85,7 @@ class DwresImportService implements ImportServiceInterface
                 ->execute();
         }
 
-        // выбираем  ПС - фидер - ТП/РП
+        // выбираем  РЭС - ПС - фидер - ТП/РП
         $importData = $this->srcFPdo
             ->from('res')
             ->innerJoin('pst on pst.id_res = res.id')
@@ -109,9 +109,15 @@ class DwresImportService implements ImportServiceInterface
 
             // сменилась ПС
             if (strcmp($prevPst, $item['PST_NAME']) != 0) {
+
                 $substationGpo = $this->substationGpoGetByName($item['PST_NAME']);
+
+                $prevPst = $item['PST_NAME'];
+                $prevPstCode = $substationGpo['code'];
+
                 if (empty($substationGpo)) {
-                    $this->logger->error(sprintf('ПС %s не найдена в справочнике ГПО', $item['PST_NAME']));
+                    // если не нашли, пропускаем вставку
+                    $this->logger->error(sprintf('ПС \'%s\' не найдена в справочнике ГПО', $item['PST_NAME']));
                     continue;
                 }
                 $prevPst = $item['PST_NAME'];
@@ -169,7 +175,7 @@ class DwresImportService implements ImportServiceInterface
                     'code' => $item['TP_NAME'],
                     'name' => $item['TP_NAME'],
                     'type' => $item['TP_SOBJ_TYPE'],
-                    'voltage' => '',
+                    'voltage' => '10',   // TODO напряжение нужно смотреть на трансформаторе
                     'status' => true
                 ])
                 ->execute();
@@ -182,7 +188,7 @@ class DwresImportService implements ImportServiceInterface
                     'code_energoObject' => $item['TP_NAME'],
                     'code' => $item['TP_NAME'],
                     'name' => $item['FIDER_NAME'] . '-' . $item['TP_NAME'],
-                    'voltage' => '',
+                    'voltage' => '10',
                     'status' => true
                 ])
                 ->execute();
@@ -197,14 +203,12 @@ class DwresImportService implements ImportServiceInterface
                     'code_srcConnection' => $fiderConnection ?? '(null)',
                     'code_dstConnection' => $tpConnection,
                     'code_region' => $prevRes,
-                    'code' => $item['FIDER_NAME'] . ' / ' . $item['TP_NAME'],
+                    'code' => $item['FIDER_NAME'] . '/' . $item['TP_NAME'],
                     'name' => 'BЛ',
                     'status' => true
                 ])
                 ->execute();
         }
-        // сжимаем TODO только для sqlite !!!
-//        $this->dstFPdo->getPDO()->exec('VACUUM');
     }
 
     private function substationGpoGetByName($substationName): ?array

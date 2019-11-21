@@ -30,7 +30,7 @@ class ImportEnergoMeshCommandHandler implements CommandHandlerInterface
     {
         $this->logger->info('import started');
         try {
-            $importService = new DwresImportService($command->srcPdo, $command->dstPdo);
+            $importService = new DwresImportService($command->srcPdo, $command->dstPdo, $this->logger);
             $importService->doFullImport();
         } catch (\Exception $e) {
             $this->logger->error('import:' . $e->getMessage());
