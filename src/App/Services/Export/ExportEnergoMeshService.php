@@ -49,7 +49,7 @@ final class ExportEnergoMeshService
             ->from('energoObject obj')
             ->leftJoin('geoCoords geo on geo.code_energoObject = obj.code')
             ->select('obj.name obj_name, obj.type obj_type, obj.voltage obj_voltage, latitude, longitude')
-            ->where('obj_type', 'ПС');
+            ->where('obj_type', ['ПС', 'РУ']);
         if (!empty($region)) {
             $substNodes->where('obj.code_region', $region);
         }

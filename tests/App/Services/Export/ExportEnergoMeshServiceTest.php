@@ -24,7 +24,7 @@ class ExportEnergoMeshServiceTest extends TestCase
     public function testGetMeshForRegion()
     {
         $service =  new ExportEnergoMeshService($this->pdo);
-        $result = $service->getMesh('51400');
+        $result = $service->getMesh('111113');
         $this->assertIsArray($result);
     }
 
@@ -46,7 +46,7 @@ class ExportEnergoMeshServiceTest extends TestCase
     public function testGetMeshWithLevelHighAndRegion()
     {
         $service =  new ExportEnergoMeshService($this->pdo);
-        $result = $service->getMesh('51500', ExportEnergoMeshService::NETWORK_LEVEL_HIGH);
+        $result = $service->getMesh('111113', ExportEnergoMeshService::NETWORK_LEVEL_HIGH);
         $this->assertIsArray($result);
         $this->assertNotEmpty($result);
     }
