@@ -29,11 +29,13 @@ class DwresImportService implements ImportServiceInterface
         $this->logger = $logger;
     }
 
+    /**
+     * Импортировать файл Dwres
+     * @throws ApplicationException
+     */
     public function import()
     {
-        // TODO удалить старые данные ???
-
-        // регионы (РЭСы)
+        // регионы (РЭСы) в dwres
         $regionList = $this->srcFPdo
             ->from('res r')
             ->innerJoin('filial f on r.id_filial = f.id')
@@ -45,23 +47,8 @@ class DwresImportService implements ImportServiceInterface
             if (empty($region['RES_CODE'])) {
                 throw new ApplicationException('не задан код РЭС для ' . implode('/', [$region['ENERGOSYS_NAME'], $region['FILIAL_NAME'], $region['RES_NAME']]));
             }
-
-            // не вставляем, эти данные есть в бд ГПО
-            /*
-                        $resExists = $this->dstFPdo
-                            ->from('region')
-                            ->where('code', $region['RES_CODE'])
-                            ->count();
-                        if (!$resExists) {
-                            $this->dstFPdo
-                                ->insertInto('region')
-                                ->values([
-                                    'code' => $region['RES_CODE'],
-                                    'name' => implode('/', [$region['ENERGOSYS_NAME'], $region['FILIAL_NAME'], $region['RES_NAME']]),
-                                ])->execute();
-                        }
-            */
-
+            // TODO нужно ли удалять старые данные ???
+            // TODO возможно нужно сделать флаг locked у данных, чтобы не удалять заведенные не из dwres
             // удаляем данные РЭСа
             // связи
             $this->dstFPdo
@@ -94,13 +81,15 @@ class DwresImportService implements ImportServiceInterface
             ->select('res.id id_res, res.id_filial, res.name res_name, res.code res_code')
             ->select('pst.id id_pst, pst.name pst_name, pst.shortname pst_shortname')
             ->select('fider.id id_fider, fider.name fider_name')
-            ->select('tp.id id_tp, tp.name tp_name, tp.obj_type tp_obj_type, tp.sobj_type tp_sobj_type, tp.code_tp')
+            ->select('tp.id id_tp, tp.name tp_name, tp.code_tp tp_code, tp.obj_type tp_obj_type, tp.sobj_type tp_sobj_type, tp.code_tp')
             ->order('res.id, res.id_filial, pst.id, fider.id, tp.id');
 
         $prevRes = $prevPst = $prevPstCode = $prevFider = $prevTp = null;
+        /** @var string $errorPst Имя последней ошибочной ПС*/
+        $errorPst = null;
 
         foreach ($importData as $item) {
-
+            $item = array_map('trim', $item);
             // сменился РЭС
             if (strcmp($prevRes, $item['RES_CODE']) != 0) {
                 $prevRes = $item['RES_CODE'];
@@ -112,12 +101,13 @@ class DwresImportService implements ImportServiceInterface
 
                 $substationGpo = $this->substationGpoByName($item['PST_NAME']);
 
-                $prevPst = $item['PST_NAME'];
-                $prevPstCode = $substationGpo['code'];
-
                 if (empty($substationGpo)) {
                     // если не нашли, пропускаем вставку
-                    $this->logger->error(sprintf('ПС \'%s\' не найдена в справочнике ОДУ', $item['PST_NAME']));
+                    if ($errorPst != $item['PST_NAME']) {
+                        // повторные сообщения не печатаем
+                        $this->logger->error('ПС \'pst_name\' не найдена в справочнике ОДУ', ['pst_name' => $item['PST_NAME']]);
+                    }
+                    $errorPst = $item['PST_NAME'];
                     continue;
                 }
                 $prevPst = $item['PST_NAME'];
@@ -129,6 +119,7 @@ class DwresImportService implements ImportServiceInterface
                         ->values([
                             'code_region' => $prevRes,
                             'code' => $prevPstCode,
+                            'localcode' => $prevPstCode,
                             'name' => $substationGpo['name'],
                             'type' => $substationGpo['type'],
                             'voltage' => $substationGpo['u'],
@@ -147,13 +138,15 @@ class DwresImportService implements ImportServiceInterface
                 try {
                     // точка подключения со стороны ПС
                     // new EnergoConnection()
+                    $fiderConnection = $prevPstCode . '.ф' . $item['FIDER_NAME']; // fider code
+
                     $this->dstFPdo
                         ->insertInto('energoConnection')
                         ->values([
                             'code_energoObject' => $prevPstCode,
-                            'code' => $item['FIDER_NAME'],
-                            'name' => $item['PST_NAME'] . '-' . $item['FIDER_NAME'],
-                            'voltage' => '',
+                            'code' => $fiderConnection,
+                            'name' => $item['PST_NAME'] . '\\' . $item['FIDER_NAME'],
+                            'voltage' => '',  // TODO напряжение
                             'status' => true
                         ])
                         ->execute();
@@ -162,17 +155,18 @@ class DwresImportService implements ImportServiceInterface
                 }
 
                 $prevFider = $item['FIDER_NAME'];
-                $fiderConnection = $item['FIDER_NAME']; // fider code
                 $prevTp = null;
             }
 
             // смена ТП/КТП
             // new EnergoObject()
+            $tpCodeFull = $prevRes . '-' . $item['TP_CODE'];
             $this->dstFPdo
                 ->insertInto('energoObject')
                 ->values([
                     'code_region' => $prevRes,
-                    'code' => $item['TP_NAME'],
+                    'code' => $tpCodeFull,
+                    'localcode' => $item['TP_CODE'],
                     'name' => $item['TP_NAME'],
                     'type' => $item['TP_SOBJ_TYPE'],
                     'voltage' => '10',   // TODO напряжение нужно смотреть на трансформаторе
@@ -182,18 +176,19 @@ class DwresImportService implements ImportServiceInterface
 
             // точка подключения к ПС со стороны ТП
             // new EnergoConnection()
+
+            $tpConnection = $tpCodeFull . '.осн';
+
             $this->dstFPdo
                 ->insertInto('energoConnection')
                 ->values([
-                    'code_energoObject' => $item['TP_NAME'],
-                    'code' => $item['TP_NAME'],
-                    'name' => $item['FIDER_NAME'] . '-' . $item['TP_NAME'],
-                    'voltage' => '10',
+                    'code_energoObject' => $tpCodeFull,
+                    'code' => $tpConnection,
+                    'name' => $item['FIDER_NAME'] . '/' . $item['TP_NAME'],
+                    'voltage' => '10',      // TODO напряжение нужно смотреть на трансформаторе
                     'status' => true
                 ])
                 ->execute();
-
-            $tpConnection = $item['TP_NAME'];
 
             // фидер к ТП
             // new EnergoLink()
