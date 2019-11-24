@@ -85,7 +85,7 @@ class DwresImportService implements ImportServiceInterface
             ->order('res.id, res.id_filial, pst.id, fider.id, tp.id');
 
         $prevRes = $prevPst = $prevPstCode = $prevFider = $prevTp = null;
-        /** @var string $errorPst Имя последней ошибочной ПС*/
+        /** @var string $errorPst Имя последней ошибочной ПС */
         $errorPst = null;
 
         foreach ($importData as $item) {
@@ -145,7 +145,7 @@ class DwresImportService implements ImportServiceInterface
                         ->values([
                             'code_energoObject' => $prevPstCode,
                             'code' => $fiderConnection,
-                            'name' => $item['PST_NAME'] . '\\' . $item['FIDER_NAME'],
+                            'name' => $item['PST_NAME'] . '/' . $item['FIDER_NAME'],
                             'voltage' => '',  // TODO напряжение
                             'status' => true
                         ])

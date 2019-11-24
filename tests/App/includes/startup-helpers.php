@@ -1,11 +1,17 @@
 <?php
 
+namespace Tests\Includes;
+
+use \PDO;
+
 function initSqliteDb(): PDO
 {
-    $sqlitePath = '../../../data/';
-//    echo(realpath(__DIR__.'/'.$sqlitePath));
+    $sqlitePath = realpath(__DIR__ . '/../../../data/');
+    if (!file_exists($sqlitePath . '/data.sqlite3')) {
+        die($sqlitePath . '/data.sqlite3 not found');
+    }
     $pdo = new PDO(
-        'sqlite:' . $sqlitePath . 'data.sqlite3',
+        'sqlite:' . $sqlitePath . '/data.sqlite3',
         '',
         '',
         [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]

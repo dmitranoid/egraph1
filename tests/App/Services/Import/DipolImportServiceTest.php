@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Test\App\Services\Import;
+namespace Tests\App\Services\Import;
 
 use App\Services\Import\DipolImportService;
 use PDO;
@@ -9,6 +9,7 @@ use PDOException;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use Psr\Log\Test\TestLogger;
+use function Tests\Includes\initSqliteDb;
 
 class DipolImportServiceTest extends TestCase
 {
@@ -39,13 +40,8 @@ class DipolImportServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        try {
-            $db = realpath(__DIR__ . '..\..\..\..\..\data\data.sqlite3');
-            $this->dstPdo = new PDO('sqlite:' . $db, '', '', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
-        } catch (PDOException $e) {
-            echo($e->getMessage());
-        }
-        $this->dstPdo->exec('PRAGMA journal_mode = MEMORY');
+
+        $this->dstPdo = initSqliteDb();
 
         $tns = " 
 (DESCRIPTION =

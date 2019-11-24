@@ -7,6 +7,7 @@ use App\Services\Import\DwresImportService;
 use PDO;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\Test\TestLogger;
+use function Tests\Includes\initSqliteDb;
 
 class DwresImportServiceTest extends TestCase
 {
@@ -22,10 +23,7 @@ class DwresImportServiceTest extends TestCase
             'sysdba', 'masterkey',
             [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
         );
-        $sqlitePath = '../../../../data/';
-        $this->dstPdo = new PDO('sqlite:' . $sqlitePath . 'data.sqlite3', '', '', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
-        $this->dstPdo->exec('ATTACH  \'' . $sqlitePath . 'dict-gpo.sqlite3\' as gpo');
-        $this->dstPdo->exec('PRAGMA journal_mode = MEMORY');
+        $this->dstPdo = initSqliteDb();
     }
 
     /**

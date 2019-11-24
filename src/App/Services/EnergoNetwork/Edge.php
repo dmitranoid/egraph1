@@ -7,21 +7,41 @@ namespace App\Services\EnergoNetwork;
 
 class Edge
 {
-
+    private $region;
     private $srcNodeCode;
     private $dstNodeCode;
     private $voltage;
-    /**
-     * @var string
-     */
     private $direction;
+    /**
+     * @var array
+     */
+    private $info;
 
-    public function __construct($srcNodeCode, $dstNodeCode, $voltage, $direction = '')
+    /**
+     * Edge constructor.
+     * @param string $region
+     * @param string $srcNodeCode
+     * @param string $dstNodeCode
+     * @param string $voltage
+     * @param string $direction
+     * @param array $info
+     */
+    public function __construct($region, $srcNodeCode, $dstNodeCode, $voltage, $direction = '', array $info = [])
     {
         $this->srcNodeCode = $srcNodeCode;
         $this->dstNodeCode = $dstNodeCode;
         $this->voltage = $voltage;
         $this->direction = $direction;
+        $this->region = $region;
+        $this->info = $info;
+    }
+
+    /**
+     * @return array
+     */
+    public function getInfo(): array
+    {
+        return $this->info;
     }
 
     /**
@@ -38,6 +58,14 @@ class Edge
     public function getDstNodeCode()
     {
         return $this->dstNodeCode;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRegion()
+    {
+        return $this->region;
     }
 
     /**

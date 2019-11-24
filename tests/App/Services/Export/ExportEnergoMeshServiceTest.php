@@ -1,12 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace Test\App\Services\Export;
+namespace Tests\App\Services\Export;
 
 
 use App\Services\Export\ExportEnergoMeshService;
+use InvalidArgumentException;
 use PDO;
 use PHPUnit\Framework\TestCase;
+use Tests\Includes;
 
 class ExportEnergoMeshServiceTest extends TestCase
 {
@@ -17,8 +19,7 @@ class ExportEnergoMeshServiceTest extends TestCase
     {
         parent::setUp();
         $dbFile = __DIR__ . '..\..\..\..\..\data\data.sqlite3';
-        $this->pdo = new PDO('sqlite:' . $dbFile, '', '', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
-        $this->pdo->exec('PRAGMA journal_mode = MEMORY');
+        $this->pdo = Includes\initSqliteDb();
     }
 
     public function testGetMeshForRegion()
@@ -39,7 +40,7 @@ class ExportEnergoMeshServiceTest extends TestCase
     public function testGetMeshWithWrongLevel()
     {
         $service =  new ExportEnergoMeshService($this->pdo);
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $result = $service->getMesh(null, 'wrongLevel');
     }
 
