@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Includes;
+namespace Tests\App\Includes;
 
 use \PDO;
 
@@ -16,7 +16,7 @@ function initSqliteDb(): PDO
         '',
         [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
     );
-    $pdo->exec('ATTACH  \'' . $sqlitePath . 'dict-gpo.sqlite3\' as gpo');
+    $pdo->exec('ATTACH  \'' . $sqlitePath . '/dict-gpo.sqlite3\' as gpo');
     $pdo->exec('PRAGMA journal_mode = MEMORY');
     return $pdo;
 }

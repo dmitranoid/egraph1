@@ -7,7 +7,7 @@ use App\Services\Import\DwresImportService;
 use PDO;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\Test\TestLogger;
-use function Tests\Includes\initSqliteDb;
+use function Tests\App\Includes\initSqliteDb;
 
 class DwresImportServiceTest extends TestCase
 {

@@ -16,17 +16,19 @@ class Edge
      * @var array
      */
     private $info;
+    private $code;
 
     /**
      * Edge constructor.
      * @param string $region
      * @param string $srcNodeCode
      * @param string $dstNodeCode
+     * @param string|null $code если null, генерируется автоматически
      * @param string $voltage
      * @param string $direction
      * @param array $info
      */
-    public function __construct($region, $srcNodeCode, $dstNodeCode, $voltage, $direction = '', array $info = [])
+    public function __construct($region, $srcNodeCode, $dstNodeCode, $code, $voltage, $direction = '', array $info = [])
     {
         $this->srcNodeCode = $srcNodeCode;
         $this->dstNodeCode = $dstNodeCode;
@@ -34,6 +36,7 @@ class Edge
         $this->direction = $direction;
         $this->region = $region;
         $this->info = $info;
+        $this->code = $code;
     }
 
     /**
@@ -58,6 +61,19 @@ class Edge
     public function getDstNodeCode()
     {
         return $this->dstNodeCode;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCode()
+    {
+        // TODO
+        if ($this->code === null) {
+            return $this->srcNodeCode . '/' . $this->dstNodeCode;
+        } else {
+            return $this->code;
+        }
     }
 
     /**

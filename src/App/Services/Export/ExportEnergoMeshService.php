@@ -5,6 +5,9 @@ namespace App\Services\Export;
 
 
 use App\Helpers\GeoDataHelper;
+use App\Services\EnergoNetwork\Edge;
+use App\Services\EnergoNetwork\EnergoNetworkBuilder;
+use App\Services\EnergoNetwork\Node;
 use Envms\FluentPDO\Query;
 use PDO;
 use Webmozart\Assert\Assert;
@@ -33,11 +36,100 @@ final class ExportEnergoMeshService
      */
     public function exportCytoscapeJson($region = null, $level = null): array
     {
-        return $this->getMesh($region, $level);
+        return $this->getMeshFromService($region, $level);
+    }
+
+    public function getMeshFromService($region = null, $level = null): array
+    {
+
+        $testedRegion = '111113';
+
+        // TODO заменить на ReadModel
+        $objects = $this->fpdo
+            ->from('energoObject obj')
+            ->leftJoin('geoCoords coord on coord.code_energoObject = obj.code')
+            ->select('obj.*, coord.*', true)
+            ->where('obj.code_region', $testedRegion)
+            ->fetchAll();
+
+        $connections = $this->fpdo
+            ->from('energoConnection conn')
+            ->innerJoin('energoObject obj on obj.code = conn.code_energoObject')
+            ->select('conn.*', true)
+            ->where('obj.code_region', $testedRegion)
+            ->fetchAll();
+
+        $links = $this->fpdo
+            ->from('energoLink link')
+            ->leftJoin('energoConnection src on src.code = link.code_srcConnection')
+            ->select('link.*, src.voltage', true)
+            ->where('link.code_region', $testedRegion)
+            ->fetchAll();
+
+        $energoNetworkObject = EnergoNetworkBuilder::createFromDbData($objects, $connections, $links);
+
+        $mesh = $energoNetworkObject->getMeshForRegion($region, self::NETWORK_LEVEL_HIGH);
+
+/* Барановичи ЭС
+        $geoHelper = new GeoDataHelper(
+            [
+                'lefttop' => ['latitude' => 53.350, 'longitude' => 24.650],
+                'rightbottom' => ['latitude' => 52.300, 'longitude' => 27.000],
+            ],
+*/
+
+/* Городской РЭС        53.183762, 25.848543    53.083555, 26.100882
+        $geoHelper = new GeoDataHelper(
+            [
+                'lefttop' => ['latitude' => 53.183762, 'longitude' => 25.848543],
+                'rightbottom' => ['latitude' => 53.083555, 'longitude' => 26.100882],
+            ],
+*/
+
+            $geoHelper = new GeoDataHelper(
+                [
+                    'lefttop' => ['latitude' => 53.183762, 'longitude' => 25.848543],
+                    'rightbottom' => ['latitude' => 53.083555, 'longitude' => 26.100882],
+                ],
+            [
+                'width' => 1920,
+                'height' => 1080
+            ]);
+
+        $cytoscapeData = [];
+        foreach ($mesh['nodes'] as $node) {
+            /** @var Node $node */
+            $cytoscapeData[] =
+                [
+                    'data' => [
+                        'id' => $node->getCode(),
+                        'caption' => $node->getInfo()['name'],
+                        'type' => $node->getInfo()['type'],
+                        'weight' => is_numeric($node->getVoltage()) ? (float)$node->getVoltage() : 0,
+                    ],
+                    'position' => $geoHelper->coords2pixels(
+                        $node->getInfo()['latitude'] ?? 0,
+                        $node->getInfo()['longitude'] ?? 0
+                    )
+                ];
+        }
+        foreach ($mesh['edges'] as $edge) {
+            /** @var Edge $edge */
+            $cytoscapeData[] = [
+                'data' => [
+                    'id' => $edge->getSrcNodeCode(),
+                    'source' => $edge->getSrcNodeCode(),
+                    'target' => $edge->getDstNodeCode(),
+                    'weight' => $edge->getVoltage(),
+                ]
+            ];
+        }
+
+        return $cytoscapeData;
     }
 
 
-    public function getMesh($region = null, $level = null): array
+    public function getMeshFromDb($region = null, $level = null): array
     {
         // для распредсети все равно показываем и основную
         if (empty($level)) {

@@ -9,7 +9,7 @@ use PDOException;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use Psr\Log\Test\TestLogger;
-use function Tests\Includes\initSqliteDb;
+use function Tests\App\Includes\initSqliteDb;
 
 class DipolImportServiceTest extends TestCase
 {
@@ -26,15 +26,37 @@ class DipolImportServiceTest extends TestCase
     public function testUpdateGeoCoords()
     {
         $logger = new TestLogger();
+        $resCode = '111113';
         $dipolImportService = new DipolImportService($this->srcPdo, $this->dstPdo, $logger);
-        $dipolImportService->updateGeoCoords('111113');
+        $dipolImportService->updateGeoCoords($resCode);
 
         if ($logger->hasErrorRecords()) {
             var_dump($logger->recordsByLevel[LogLevel::ERROR]);
+            foreach ($logger->recordsByLevel[LogLevel::ERROR] as $record) {
+                file_put_contents(sprintf('d:/%s_%s.log', $resCode, LogLevel::ERROR), implode(' | ', $this->array_flatten($record)) . PHP_EOL, FILE_APPEND);
+            }
         }
+
         if ($logger->hasWarningRecords()) {
+            file_put_contents(sprintf('d:/%s_%s.log', $resCode, LogLevel::WARNING), '');
             var_dump($logger->recordsByLevel[LogLevel::WARNING]);
+            foreach ($logger->recordsByLevel[LogLevel::WARNING] as $record) {
+                file_put_contents(sprintf('d:/%s_%s.log', $resCode, LogLevel::WARNING), implode(' | ', $this->array_flatten($record)) . PHP_EOL, FILE_APPEND);
+            }
         }
+    }
+
+    private function array_flatten($array, $prefix = '')
+    {
+        $result = array();
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $result = $result + $this->array_flatten($value, $prefix . $key . '.');
+            } else {
+                $result[$prefix . $key] = $value;
+            }
+        }
+        return $result;
     }
 
     protected function setUp(): void
