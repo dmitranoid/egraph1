@@ -4,10 +4,12 @@ declare(strict_types=1);
 namespace App\Services\Export;
 
 
+use App\Exceptions\ApplicationException;
 use App\Helpers\GeoDataHelper;
 use App\Services\EnergoNetwork\Edge;
 use App\Services\EnergoNetwork\EnergoNetworkBuilder;
 use App\Services\EnergoNetwork\Node;
+use Envms\FluentPDO\Exception;
 use Envms\FluentPDO\Query;
 use PDO;
 use Webmozart\Assert\Assert;
@@ -39,32 +41,44 @@ final class ExportEnergoMeshService
         return $this->getMeshFromService($region, $level);
     }
 
-    public function getMeshFromService($region = null, $level = null): array
+    /**
+     * возвращает массив узлов и связей для указанного РЭС
+     *
+     * @param null $region
+     * @param null $level
+     * @return array
+     * @throws ApplicationException
+     */
+    public function getMeshFromService($region = null, $level = 'l'): array
     {
-
-        $testedRegion = '111113';
-
+        Assert::notEmpty($region);
+        Assert::true(in_array($level, [self::NETWORK_LEVEL_HIGH, self::NETWORK_LEVEL_LOW]));
         // TODO заменить на ReadModel
-        $objects = $this->fpdo
-            ->from('energoObject obj')
-            ->leftJoin('geoCoords coord on coord.code_energoObject = obj.code')
-            ->select('obj.*, coord.*', true)
-            ->where('obj.code_region', $testedRegion)
-            ->fetchAll();
+        try {
+            $objects = $this->fpdo
+                ->from('energoObject obj')
+                ->leftJoin('geoCoords coord on coord.code_energoObject = obj.code')
+                ->select('obj.*, coord.*', true)
+                ->where('obj.code_region', $region)
+                ->fetchAll();
 
-        $connections = $this->fpdo
-            ->from('energoConnection conn')
-            ->innerJoin('energoObject obj on obj.code = conn.code_energoObject')
-            ->select('conn.*', true)
-            ->where('obj.code_region', $testedRegion)
-            ->fetchAll();
+            $connections = $this->fpdo
+                ->from('energoConnection conn')
+                ->innerJoin('energoObject obj on obj.code = conn.code_energoObject')
+                ->select('conn.*', true)
+                ->where('obj.code_region', $region)
+                ->fetchAll();
 
-        $links = $this->fpdo
-            ->from('energoLink link')
-            ->leftJoin('energoConnection src on src.code = link.code_srcConnection')
-            ->select('link.*, src.voltage', true)
-            ->where('link.code_region', $testedRegion)
-            ->fetchAll();
+            $links = $this->fpdo
+                ->from('energoLink link')
+                ->leftJoin('energoConnection src on src.code = link.code_srcConnection')
+                ->leftJoin('energoConnection dst on dst.code = link.code_dstConnection')
+                ->select('link.*, src.voltage src_voltage, dst.voltage dst_voltage', true)
+                ->where('link.code_region', $region)
+                ->fetchAll();
+        } catch (\Envms\FluentPDO\Exception $e) {
+            throw new ApplicationException('ошибка работы с БД', 0, $e);
+        }
 
         $energoNetworkObject = EnergoNetworkBuilder::createFromDbData($objects, $connections, $links);
 
@@ -117,10 +131,10 @@ final class ExportEnergoMeshService
             /** @var Edge $edge */
             $cytoscapeData[] = [
                 'data' => [
-                    'id' => $edge->getSrcNodeCode(),
+                    'id' => $edge->getCode(),
                     'source' => $edge->getSrcNodeCode(),
                     'target' => $edge->getDstNodeCode(),
-                    'weight' => $edge->getVoltage(),
+                    'weight' => is_numeric($edge->getVoltage()) ? (float)$edge->getVoltage() : 0,
                 ]
             ];
         }
@@ -137,11 +151,13 @@ final class ExportEnergoMeshService
         }
         Assert::true($level == self::NETWORK_LEVEL_LOW || $level == self::NETWORK_LEVEL_HIGH, 'неправильно задан уровень сети');
 
+        $topLevelObjectTypes = ['ПС', 'РУ'];
+
         $substNodes = $this->fpdo
             ->from('energoObject obj')
             ->leftJoin('geoCoords geo on geo.code_energoObject = obj.code')
             ->select('obj.name obj_name, obj.type obj_type, obj.voltage obj_voltage, latitude, longitude')
-            ->where('obj_type', ['ПС', 'РУ']);
+            ->where('obj_type', $topLevelObjectTypes);
         if (!empty($region)) {
             $substNodes->where('obj.code_region', $region);
         }

@@ -74,10 +74,11 @@ final class DipolImportService implements ImportServiceInterface
             ->select('PRUP_CODE, PFAS_CODE, P_CODE, P_NAME, P_VOLTAGE, P_TYPE, LATITUDE_X3, LONGITUDE_X3');
         $substationsDipol = $substationsDipol->fetchAll();
 
+        $topLevelObjectTypes = ['ТП', 'РУ'];
         foreach ($substationsDipol as $substDipol) {
             $substationForUpdate = $this->dstFPdo
                 ->from('energoObject')
-                ->where('type', 'ПС')
+                ->where('type', $topLevelObjectTypes)
                 ->where('php_strcmp(name, ?) = 0', $substDipol['P_NAME'])
                 ->select('code_region, code, name');
             if (!empty($region)) {

@@ -97,7 +97,7 @@ class EnergoNetworkBuilder
                     $link['code_srcConnection'],
                     $link['code_dstConnection'],
                     $link['code'],
-                    $link['voltage'] ?? 0,
+                    $link['src_voltage'] ?? 0,
                     'both',
                     [
                         'name' => $link['name'],
@@ -192,7 +192,7 @@ class EnergoNetworkBuilder
         foreach ($rootNodes as $rootNode) {
             $tree[$rootNode->getCode()] = $this->getTreeForNode($rootNode->getCode());
         }
-        return $tree;
+        return $tree ?? [];
     }
 
     /**

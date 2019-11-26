@@ -5,6 +5,7 @@ namespace App\Services\Import;
 
 
 use App\Exceptions\ApplicationException;
+use Envms\FluentPDO\Exception;
 use Envms\FluentPDO\Query;
 use PDO;
 use PDOException;
@@ -89,6 +90,14 @@ class DwresImportService implements ImportServiceInterface
         $errorPst = null;
 
         foreach ($importData as $item) {
+            /**
+             * @comment
+             * так как в некоторых РЭС фидер именуется как ВЛ-750
+             * а в некоторых просто 750, обрабатываем до цифр
+             * т.е. ВЛ-750 -> 750
+             */
+            $item['FIDER_NAME'] = trim(str_replace(['ВЛ-', 'КЛ-'], '', $item['FIDER_NAME']));
+
             $item = array_map('trim', $item);
             // сменился РЭС
             if (strcmp($prevRes, $item['RES_CODE']) != 0) {
@@ -126,7 +135,7 @@ class DwresImportService implements ImportServiceInterface
                             'status' => true
                         ])
                         ->execute();
-                } catch (PDOException $e) {
+                } catch (\Envms\FluentPDO\Exception $e) {
                     throw new ApplicationException('ошибка при импорте из dwres', 0, $e);
                 }
 
