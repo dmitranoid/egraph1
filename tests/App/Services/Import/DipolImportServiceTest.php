@@ -26,7 +26,7 @@ class DipolImportServiceTest extends TestCase
     public function testUpdateGeoCoords()
     {
         $logger = new TestLogger();
-        $resCode = '111116';
+        $resCode = '111115';
         $dipolImportService = new DipolImportService($this->srcPdo, $this->dstPdo, $logger);
         $dipolImportService->updateGeoCoords($resCode);
 

@@ -151,7 +151,7 @@ final class DipolImportService implements ImportServiceInterface
     }
 
     /**
-     * @param $region
+     * @param string $region
      * @throws Exception
      */
     private function updateTpCoordsFromDipol($region)
@@ -190,7 +190,7 @@ final class DipolImportService implements ImportServiceInterface
             $tpForUpdate = $this->dstFPdo
                 ->from('energoObject')
                 ->where('type', ['ТП', 'РП'])
-                ->where('php_strcmp(name, ?) = 0', $tpDipolCode)
+                ->where('php_strcmp(localcode, ?) = 0', $tpDipolCode)
                 ->where('code_region', $region)
                 ->select('code, name');
 

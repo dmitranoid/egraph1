@@ -18,7 +18,8 @@ class DwresImportServiceTest extends TestCase
     {
         parent::setUp();
 
-        $srcHost = 'firebird:dbname=localhost:f:\wwwork\egraph_import_data\dwres2\bars.fdb;charset=UTF8';
+        $dbFilename = 'ber.fdb';
+        $srcHost = 'firebird:dbname=localhost:f:\wwwork\egraph_import_data\dwres2\\'.$dbFilename.';charset=UTF8';
         $this->srcPdo = new PDO(
             $srcHost,
             'sysdba', 'masterkey',
