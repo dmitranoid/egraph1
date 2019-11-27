@@ -170,23 +170,27 @@ final class DipolImportService implements ImportServiceInterface
         // получаем ТП из диполя
         $tpDipolList = $this->srcFPdo
             ->from('tp')
-            ->leftJoin('pdocs on pdocs.doc_code = tp.doc_code')
+            ->leftJoin('pdocs tpdoc on tpdoc.doc_code = tp.doc_code')
+            ->leftJoin('pdocs vl10doc on vl10doc.doc_code = tp_vl_10.line_doc_code')
+            ->leftJoin('tp_vl_10 on tp.doc_code = tp_vl_10.doc_code')
             ->leftJoin('tp_sys_types on tp.substation_type_id = tp_sys_types.id')
-            ->select('tp.doc_code, type_txt tp_type, pdocs.doc_name tp_no, address, tp_num, line_voltage, latitude_x3, longitude_x3')
-            ->where('template_code', 'TP')
+            ->select(null, true)
+            ->select('tp.doc_code, type_txt tp_type, tpdoc.doc_name tp_no, address, tp_num, line_voltage, latitude_x3, longitude_x3')
+            ->select('vl10doc.doc_name fider_name')
+            ->where('tpdoc.template_code', 'TP')
             ->where('tp.doc_code like ?', $this->dwres2dipolFull($region) . '%');
         $tpDipolList = $tpDipolList->fetchAll();
 
         foreach ($tpDipolList as $tpDipol) {
             $tpDipol = array_map('trim', $tpDipol);
+            // TODO !!! узнать как вносят в диполь делают в остальных РЭС
             // так как в dipol нет возможности выбрать просто ТП, вместо него используют ЗТП (городской РЭС)
             // поэтому исправляем ЗПТ->ТП
             if ('ЗТП' == $tpDipol['TP_TYPE']) {
-                // TODO !!! узнать как вносят в диполь делают в остальных РЭС
                 $tpDipol['TP_TYPE'] = 'ТП';
             }
-
-            $tpDipolCode = sprintf('%s-%s', $tpDipol['TP_TYPE'], $tpDipol['TP_NO']);
+            // TODO здесь надо достать из dipol номер питающешо фидера
+            $tpDipolCode = sprintf('%s-%s', $tpDipol['FIDER_NAME'], $tpDipol['TP_NO']);
             $tpForUpdate = $this->dstFPdo
                 ->from('energoObject')
                 ->where('type', ['ТП', 'РП'])
