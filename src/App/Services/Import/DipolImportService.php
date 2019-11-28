@@ -14,11 +14,11 @@ use Webmozart\Assert\Assert;
 final class DipolImportService implements ImportServiceInterface
 {
     protected $regionMatching = [
-        'gan' => ['dipol' => '1', 'dipolFull' => '50515101', 'dwres' => '111111'],
-        'lah' => ['dipol' => '2', 'dipolFull' => '50515102', 'dwres' => '111112'],
+        'gan' =>  ['dipol' => '1', 'dipolFull' => '50515101', 'dwres' => '111111'],
+        'lah' =>  ['dipol' => '2', 'dipolFull' => '50515102', 'dwres' => '111112'],
         'barg' => ['dipol' => '3', 'dipolFull' => '50515103', 'dwres' => '111113'],
-        'iva' => ['dipol' => '4', 'dipolFull' => '50515104', 'dwres' => '111114'],
-        'ber' => ['dipol' => '5', 'dipolFull' => '50515105', 'dwres' => '111115'],
+        'iva' =>  ['dipol' => '4', 'dipolFull' => '50515104', 'dwres' => '111114'],
+        'ber' =>  ['dipol' => '5', 'dipolFull' => '50515105', 'dwres' => '111115'],
         'bars' => ['dipol' => '6', 'dipolFull' => '50515106', 'dwres' => '111116'],
     ];
 
@@ -168,11 +168,12 @@ final class DipolImportService implements ImportServiceInterface
         //$this->dwres2dipolFull($region);
 
         // получаем ТП из диполя
+        // TODO Фидер может быть но только в VL-10 но и CL-10 !!! доделать запрос
         $tpDipolList = $this->srcFPdo
             ->from('tp')
             ->leftJoin('pdocs tpdoc on tpdoc.doc_code = tp.doc_code')
-            ->leftJoin('pdocs vl10doc on vl10doc.doc_code = tp_vl_10.line_doc_code')
             ->leftJoin('tp_vl_10 on tp.doc_code = tp_vl_10.doc_code')
+            ->leftJoin('pdocs vl10doc on vl10doc.doc_code = tp_vl_10.line_doc_code')
             ->leftJoin('tp_sys_types on tp.substation_type_id = tp_sys_types.id')
             ->select(null, true)
             ->select('tp.doc_code, type_txt tp_type, tpdoc.doc_name tp_no, address, tp_num, line_voltage, latitude_x3, longitude_x3')
@@ -189,7 +190,7 @@ final class DipolImportService implements ImportServiceInterface
             if ('ЗТП' == $tpDipol['TP_TYPE']) {
                 $tpDipol['TP_TYPE'] = 'ТП';
             }
-            // TODO здесь надо достать из dipol номер питающешо фидера
+
             $tpDipolCode = sprintf('%s-%s', $tpDipol['FIDER_NAME'], $tpDipol['TP_NO']);
             $tpForUpdate = $this->dstFPdo
                 ->from('energoObject')
@@ -202,7 +203,7 @@ final class DipolImportService implements ImportServiceInterface
 
             if (empty($tpForUpdate)) {
                 $this->logger->warning(
-                    'ТП из БД Dipol на найден в БД dwres',
+                    'ТП из БД Dipol \'dipol_doc_code\' (dipol_code) не найдено в БД dwres',
                     [
                         'dipol_code' => $tpDipolCode,
                         'dipol_doc_code' => $tpDipol['DOC_CODE']
@@ -212,7 +213,7 @@ final class DipolImportService implements ImportServiceInterface
                 try {
                     if (empty($tpDipol['LATITUDE_X3']) || empty($tpDipol['LONGITUDE_X3'])) {
                         $this->logger->warning(
-                            'не найдены координаты в Dipol для \'tpcode\'',
+                            'не заполнены координаты в Dipol для \'tpname\' (tpcode, region)',
                             [
                                 'tpname' => $tpForUpdate['name'],
                                 'tpcode' => $tpForUpdate['code'],
@@ -228,7 +229,7 @@ final class DipolImportService implements ImportServiceInterface
                     }
                 } catch (PDOException $e) {
                     $this->logger->error(
-                        'ошибка SQL при обновлении координат ТП \'tpcode\' :error',
+                        'ошибка SQL при обновлении координат ТП \'tpcode\' error',
                         [
                             'tpcode' => $tpDipolCode,
                             'error' => $e->getMessage()
@@ -261,7 +262,7 @@ final class DipolImportService implements ImportServiceInterface
     }
 
     /**
-     * Возвращает код РЭС взятый из кода документа Dipol
+     * Извлекает код РЭС из поля DOC_CODE Dipol
      *
      * например '50515101-TP-279' -> '50515101'
      *

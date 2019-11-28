@@ -33,7 +33,7 @@ class DipolImportServiceTest extends TestCase
         if ($logger->hasErrorRecords()) {
             var_dump($logger->recordsByLevel[LogLevel::ERROR]);
             foreach ($logger->recordsByLevel[LogLevel::ERROR] as $record) {
-                file_put_contents(sprintf('d:/%s_%s.log', $resCode, LogLevel::ERROR), implode(' | ', $this->array_flatten($record)) . PHP_EOL, FILE_APPEND);
+                file_put_contents(sprintf('d:/%s_%s.log', $resCode, LogLevel::ERROR), strtr($record['message'], $record['context']). PHP_EOL, FILE_APPEND);
             }
         }
 
@@ -41,7 +41,7 @@ class DipolImportServiceTest extends TestCase
             file_put_contents(sprintf('d:/%s_%s.log', $resCode, LogLevel::WARNING), '');
             var_dump($logger->recordsByLevel[LogLevel::WARNING]);
             foreach ($logger->recordsByLevel[LogLevel::WARNING] as $record) {
-                file_put_contents(sprintf('d:/%s_%s.log', $resCode, LogLevel::WARNING), implode(' | ', $this->array_flatten($record)) . PHP_EOL, FILE_APPEND);
+                file_put_contents(sprintf('d:/%s_%s.log', $resCode, LogLevel::WARNING), strtr($record['message'], $record['context']). PHP_EOL, FILE_APPEND);
             }
         }
     }
