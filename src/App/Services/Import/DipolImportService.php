@@ -4,21 +4,21 @@ declare(strict_types=1);
 namespace App\Services\Import;
 
 
+use App\Exceptions\ApplicationException;
 use Envms\FluentPDO\Exception;
 use Envms\FluentPDO\Query;
 use PDO;
-use PDOException;
 use Psr\Log\LoggerInterface;
 use Webmozart\Assert\Assert;
 
 final class DipolImportService implements ImportServiceInterface
 {
     protected $regionMatching = [
-        'gan' =>  ['dipol' => '1', 'dipolFull' => '50515101', 'dwres' => '111111'],
-        'lah' =>  ['dipol' => '2', 'dipolFull' => '50515102', 'dwres' => '111112'],
+        'gan' => ['dipol' => '1', 'dipolFull' => '50515101', 'dwres' => '111111'],
+        'lah' => ['dipol' => '2', 'dipolFull' => '50515102', 'dwres' => '111112'],
         'barg' => ['dipol' => '3', 'dipolFull' => '50515103', 'dwres' => '111113'],
-        'iva' =>  ['dipol' => '4', 'dipolFull' => '50515104', 'dwres' => '111114'],
-        'ber' =>  ['dipol' => '5', 'dipolFull' => '50515105', 'dwres' => '111115'],
+        'iva' => ['dipol' => '4', 'dipolFull' => '50515104', 'dwres' => '111114'],
+        'ber' => ['dipol' => '5', 'dipolFull' => '50515105', 'dwres' => '111115'],
         'bars' => ['dipol' => '6', 'dipolFull' => '50515106', 'dwres' => '111116'],
     ];
 
@@ -51,23 +51,27 @@ final class DipolImportService implements ImportServiceInterface
         $this->logger = $logger;
     }
 
-    public function updateGeoCoords($region = null)
+    /**
+     * Обновить кооридинаты всего что можно, получив их из Dipol
+     * @param string $region
+     * @throws ApplicationException
+     */
+    public function updateGeoCoords($region)
     {
+        Assert::notEmpty($region);
         $this->updateSubstCoordsFromDipol($region);
         $this->updateTpCoordsFromDipol($region);
     }
 
     /**
      * Обновить в основной БД координаты ПС из Dipol
-     * @param string|null $region код района ЭС или null для всех
+     * @param string $region код района ЭС
      * @throws Exception
      */
-    private function updateSubstCoordsFromDipol($region = null)
+    private function updateSubstCoordsFromDipol($region)
     {
-        $regionsDipol = $this->srcFPdo
-            ->from('PDEPARTMENTS')
-            ->select('PCONCERN_CODE, PRUP_CODE, PFAS_CODE, PDEPARTMENT_CODE, PDEPARTMENT_NAME, PDEPARTMENT_TYPE');
-        $regionsDipol = $regionsDipol->fetchAll();
+        Assert::notEmpty($region);
+        Assert::string($region);
 
         $substationsDipol = $this->srcFPdo
             ->from('PSUBSTATIONS')
@@ -90,7 +94,7 @@ final class DipolImportService implements ImportServiceInterface
             if (!empty($substationForUpdate)) {
                 //обновляем координаты ПС
                 if (!(empty($substDipol['LATITUDE_X3']) || empty($substDipol['LONGITUDE_X3']))) {
-                    $this->updateCoordsInDb(
+                    $this->pushCoordsToDb(
                         $substationForUpdate['code'],
                         $substDipol['LATITUDE_X3'],
                         $substDipol['LONGITUDE_X3']
@@ -107,7 +111,7 @@ final class DipolImportService implements ImportServiceInterface
                         ->update('energoObject', ['voltage' => $substDipol['P_VOLTAGE']])
                         ->where('code', $substationForUpdate['code'])
                         ->execute();
-                } catch (PDOException $e) {
+                } catch (Exception $e) {
                     $this->logger->error(
                         'ошибка SQL при обновлении координат ПС \'pscode\' :error',
                         [
@@ -127,7 +131,7 @@ final class DipolImportService implements ImportServiceInterface
      * @param $longitude
      * @throws Exception
      */
-    private function updateCoordsInDb($codeEnergoObject, $latitude, $longitude): void
+    private function pushCoordsToDb($codeEnergoObject, $latitude, $longitude): void
     {
         // TODO возможно нужен код РЭС
         Assert::notEmpty($codeEnergoObject);
@@ -151,21 +155,15 @@ final class DipolImportService implements ImportServiceInterface
     }
 
     /**
+     * Обновить в основной БД коридинаты ТП, взяв их из Dipol
      * @param string $region
      * @throws Exception
      */
     private function updateTpCoordsFromDipol($region)
     {
-        // все РЭСы сразу неудобно, нет возможности фильтровать ошибки
-        // поэтому делаем только по СЭС
+        // работать с массивом РЭС неудобно, нет возможности фильтровать ошибки поиска
+        // поэтому делаем по одному РЭС, цикл по ним вне класса
         Assert::notNull($region);
-
-        $regionsDipol = $this->srcFPdo
-            ->from('PDEPARTMENTS')
-            ->select('PCONCERN_CODE, PRUP_CODE, PFAS_CODE, PDEPARTMENT_CODE, PDEPARTMENT_NAME, PDEPARTMENT_TYPE');
-        $regionsDipol = $regionsDipol->fetchAll();
-
-        //$this->dwres2dipolFull($region);
 
         // получаем ТП из диполя
         // TODO Фидер может быть но только в VL-10 но и CL-10 !!! доделать запрос
@@ -179,7 +177,7 @@ final class DipolImportService implements ImportServiceInterface
             ->select('tp.doc_code, type_txt tp_type, tpdoc.doc_name tp_no, address, tp_num, line_voltage, latitude_x3, longitude_x3')
             ->select('vl10doc.doc_name fider_name')
             ->where('tpdoc.template_code', 'TP')
-            ->where('tp.doc_code like ?', $this->dwres2dipolFull($region) . '%');
+            ->where('tp.doc_code like ?', $this->dwres2dipolFullCode($region) . '%');
         $tpDipolList = $tpDipolList->fetchAll();
 
         foreach ($tpDipolList as $tpDipol) {
@@ -221,13 +219,13 @@ final class DipolImportService implements ImportServiceInterface
                             ]
                         );
                     } else {
-                        $this->updateCoordsInDb(
+                        $this->pushCoordsToDb(
                             $tpForUpdate['code'],
                             $tpDipol['LATITUDE_X3'],
                             $tpDipol['LONGITUDE_X3']
                         );
                     }
-                } catch (PDOException $e) {
+                } catch (Exception $e) {
                     $this->logger->error(
                         'ошибка SQL при обновлении координат ТП \'tpcode\' error',
                         [
@@ -240,7 +238,7 @@ final class DipolImportService implements ImportServiceInterface
         }
     }
 
-    private function dwres2dipolFull($code): ?string
+    private function dwres2dipolFullCode($code): ?string
     {
         foreach ($this->regionMatching as $name => $item) {
             if (0 == strcmp($item['dwres'], $code)) {
@@ -250,7 +248,7 @@ final class DipolImportService implements ImportServiceInterface
         return null;
     }
 
-    private function dipol2dwres($code): ?string
+    private function dipol2dwresCode($code): ?string
     {
         Assert::notEmpty($code);
         foreach ($this->regionMatching as $name => $item) {
@@ -295,7 +293,7 @@ final class DipolImportService implements ImportServiceInterface
      * @param $code
      * @return string|null
      */
-    private function dipolFull2dwres($code): ?string
+    private function dipolFull2dwresCode($code): ?string
     {
         Assert::notEmpty($code);
         foreach ($this->regionMatching as $name => $item) {

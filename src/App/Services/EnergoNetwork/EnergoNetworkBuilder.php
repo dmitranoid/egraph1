@@ -206,6 +206,8 @@ class EnergoNetworkBuilder
         return $this->treeNodeBuilder($code, $voltage);
     }
 
+
+
     /**
      * Возвращает дерево из узлов, опускаясь по напряжению
      *

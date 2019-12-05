@@ -5,7 +5,6 @@ namespace Tests\App\Services\Import;
 
 use App\Services\Import\DipolImportService;
 use PDO;
-use PDOException;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use Psr\Log\Test\TestLogger;
