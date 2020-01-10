@@ -52,7 +52,7 @@ final class DipolImportService implements ImportServiceInterface
     }
 
     /**
-     * Обновить кооридинаты всего что можно, получив их из Dipol
+     * Обновить координаты всего что можно, получив их из Dipol
      * @param string $region
      * @throws ApplicationException
      */
@@ -66,7 +66,7 @@ final class DipolImportService implements ImportServiceInterface
     /**
      * Обновить в основной БД координаты ПС из Dipol
      * @param string $region код района ЭС
-     * @throws Exception
+     * @throws ApplicationException
      */
     private function updateSubstCoordsFromDipol($region)
     {
@@ -76,7 +76,13 @@ final class DipolImportService implements ImportServiceInterface
         $substationsDipol = $this->srcFPdo
             ->from('PSUBSTATIONS')
             ->select('PRUP_CODE, PFAS_CODE, P_CODE, P_NAME, P_VOLTAGE, P_TYPE, LATITUDE_X3, LONGITUDE_X3');
-        $substationsDipol = $substationsDipol->fetchAll();
+        try {
+            $substationsDipol = $substationsDipol->fetchAll();
+        } catch (Exception $e) {
+            $this->logger->error($e->getMessage());
+            throw new ApplicationException('Ошибка обновления координат из Диполь', 0, $e);
+
+        }
 
         $topLevelObjectTypes = ['ТП', 'РУ'];
         foreach ($substationsDipol as $substDipol) {
@@ -101,7 +107,7 @@ final class DipolImportService implements ImportServiceInterface
                     );
                 } else {
                     $this->logger->warning(
-                        'не заполнены координаты в Dipol для ПС \'pscode\'',
+                        'не заполнены координаты в Dipol для ПС \'{pscode}\'',
                         ['pscode' => $substationForUpdate['code'] . '-' . $substationForUpdate['name']]
                     );
                 }
@@ -113,7 +119,7 @@ final class DipolImportService implements ImportServiceInterface
                         ->execute();
                 } catch (Exception $e) {
                     $this->logger->error(
-                        'ошибка SQL при обновлении координат ПС \'pscode\' :error',
+                        'ошибка SQL при обновлении координат ПС {pscode} {error}',
                         [
                             'pscode' => $substationForUpdate['code'],
                             'error' => $e->getMessage()
@@ -201,7 +207,7 @@ final class DipolImportService implements ImportServiceInterface
 
             if (empty($tpForUpdate)) {
                 $this->logger->warning(
-                    'ТП из БД Dipol \'dipol_doc_code\' (dipol_code) не найдено в БД dwres',
+                    'ТП из БД Dipol {dipol_doc_code} ({dipol_code}) не найдено в БД dwres',
                     [
                         'dipol_code' => $tpDipolCode,
                         'dipol_doc_code' => $tpDipol['DOC_CODE']
@@ -211,7 +217,7 @@ final class DipolImportService implements ImportServiceInterface
                 try {
                     if (empty($tpDipol['LATITUDE_X3']) || empty($tpDipol['LONGITUDE_X3'])) {
                         $this->logger->warning(
-                            'не заполнены координаты в Dipol для \'tpname\' (tpcode, region)',
+                            'не заполнены координаты в Dipol для \'{tpname}\' ({tpcode}, {region})',
                             [
                                 'tpname' => $tpForUpdate['name'],
                                 'tpcode' => $tpForUpdate['code'],
@@ -227,7 +233,7 @@ final class DipolImportService implements ImportServiceInterface
                     }
                 } catch (Exception $e) {
                     $this->logger->error(
-                        'ошибка SQL при обновлении координат ТП \'tpcode\' error',
+                        'ошибка SQL при обновлении координат ТП \'{tpcode}\' {error}',
                         [
                             'tpcode' => $tpDipolCode,
                             'error' => $e->getMessage()

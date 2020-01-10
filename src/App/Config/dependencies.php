@@ -27,7 +27,7 @@ return [
         return App\ServiceProviders\MonologServiceProvider::register($c);
     }),
     'logger' => get(LoggerInterface::class),
-    \PDO::class => DI\factory(function (ContainerInterface $c) {
+    PDO::class => DI\factory(function (ContainerInterface $c) {
         return PDOSQLiteServiceProvider::register($c);
     }),
     'db' => get(\PDO::class),

@@ -13,6 +13,7 @@ class MonologServiceProvider implements ServiceProviderInterface
         $settings = $container->get('settings');
         $logger = new Logger($settings['logger']['name']);
         $logger->pushProcessor(new Monolog\Processor\UidProcessor());
+        $logger->pushProcessor(new Monolog\Processor\PsrLogMessageProcessor());
         $logger->pushHandler(new Monolog\Handler\StreamHandler($settings['logger']['path'], Monolog\Logger::DEBUG));
         return $logger;
     }
