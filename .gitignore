@@ -5,4 +5,5 @@ storage/cache/
 .vscode/
 .env
 !distr.env
+!.empty
 composer.lock
