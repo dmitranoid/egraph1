@@ -13,7 +13,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 
-class ApiResourceGenericController implements ApiResourceControllerInterface
+abstract class ApiResourceGenericController implements ApiResourceControllerInterface
 {
     /**
      * @var LoggerInterface
@@ -52,19 +52,11 @@ class ApiResourceGenericController implements ApiResourceControllerInterface
         return (call_user_func([$this, $method], $request, $response, $args));
     }
 
-    public function index(RequestInterface $request, ResponseInterface $response, array $args)
-    {
-        // TODO: Implement index() method.
-    }
+    abstract public function index(RequestInterface $request, ResponseInterface $response, array $args);
 
-    public function show(RequestInterface $request, ResponseInterface $response, array $args)
-    {
-        // TODO: Implement get() method.
-    }
+    abstract public function show(RequestInterface $request, ResponseInterface $response, array $args);
 
-    public function store(RequestInterface $request, ResponseInterface $response, array $args)
-    {
-        // TODO: Implement post() method.
-    }
+    abstract public function store(RequestInterface $request, ResponseInterface $response, array $args);
+
 
 }

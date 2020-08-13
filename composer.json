@@ -1,5 +1,5 @@
 {
-  "name": "energo.objects.net",
+  "name": "dmitranoid/energo.objects.net",
   "description": "test energo.objects.net",
   "license": "BSD-3-Clause",
   "type": "project",
@@ -30,6 +30,7 @@
     ]
   },
   "require": {
+    "php": "^7.4",
     "ext-pdo": "*",
     "ext-json": "*",
     "slim/http": "*",
@@ -45,7 +46,7 @@
     "myclabs/php-enum": "^1.5",
     "psr/cache": "^1.0",
     "envms/fluentpdo": "^2.1",
-    "twig/twig": "2.8",
+    "twig/twig": "^3",
     "hisamu/php-xbase": "^1.0"
   },
   "require-dev": {

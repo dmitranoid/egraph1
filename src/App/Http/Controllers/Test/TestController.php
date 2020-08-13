@@ -8,7 +8,6 @@
 
 namespace App\Http\Controllers\Test;
 
-
 use App\Infrastructure\View\ViewInterface;
 use Domain\Entities\EnergoObject\EnergoObject;
 use Domain\Enums\ActivityStatus;
@@ -54,13 +53,12 @@ class TestController
     */
     public function indexAction(ServerRequestInterface $request, ResponseInterface $response, $args)
     {
-        return ($this->view->render($response, 'test\index.twig', ['content'=>__CLASS__. ' - ' . __METHOD__]));
+        return ($this->view->render($response, 'front\test\index.twig', ['content'=>__CLASS__. ' - ' . __METHOD__]));
     }
 
     public function testAction(ServerRequestInterface $request, ResponseInterface $response, $args)
     {
-        $b = 100 / 0;
-        return ($this->view->render($response, 'test\index.twig', ['content'=>__CLASS__. ' - ' . __METHOD__]));
+        return ($this->view->render($response, 'front\test\index.twig', ['content'=>__CLASS__. ' - ' . __METHOD__]));
     }
 
     public function testDomainAction(ServerRequestInterface $request, ResponseInterface $response, $args)
@@ -77,5 +75,4 @@ class TestController
         $response->getBody()->write(var_export($energoObject));
         return $response;
     }
-
 }

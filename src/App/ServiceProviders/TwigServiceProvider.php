@@ -12,6 +12,6 @@ class TwigServiceProvider implements ServiceProviderInterface
     {
         $settings = $container->get('settings')['view'];
         $twigSettings = $settings['twig'];
-        return new TwigView(new Twig($settings['template_path'], $twigSettings));
+        return new TwigView(Twig::create($settings['template_path'], $twigSettings));
     }
 }

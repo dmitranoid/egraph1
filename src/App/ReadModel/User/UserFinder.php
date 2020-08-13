@@ -2,6 +2,7 @@
 
 namespace App\ReadModel;
 
-class UserFinder extends BaseFinder {
+class UserFinder extends BaseFinder
+{
     
 }
