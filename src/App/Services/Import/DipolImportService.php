@@ -14,11 +14,11 @@ use Webmozart\Assert\Assert;
 final class DipolImportService implements ImportServiceInterface
 {
     protected $regionMatching = [
-        'gan' => ['dipol' => '1', 'dipolFull' => '50515101', 'dwres' => '111111'],
-        'lah' => ['dipol' => '2', 'dipolFull' => '50515102', 'dwres' => '111112'],
+        'gan' =>  ['dipol' => '1', 'dipolFull' => '50515101', 'dwres' => '111111'],
+        'lah' =>  ['dipol' => '2', 'dipolFull' => '50515102', 'dwres' => '111112'],
         'barg' => ['dipol' => '3', 'dipolFull' => '50515103', 'dwres' => '111113'],
-        'iva' => ['dipol' => '4', 'dipolFull' => '50515104', 'dwres' => '111114'],
-        'ber' => ['dipol' => '5', 'dipolFull' => '50515105', 'dwres' => '111115'],
+        'iva' =>  ['dipol' => '4', 'dipolFull' => '50515104', 'dwres' => '111114'],
+        'ber' =>  ['dipol' => '5', 'dipolFull' => '50515105', 'dwres' => '111115'],
         'bars' => ['dipol' => '6', 'dipolFull' => '50515106', 'dwres' => '111116'],
     ];
 
