@@ -1,4 +1,6 @@
 <?php
+set_time_limit(600);
+ini_set('memory_limit','500M');
 
 // To help the built-in PHP dev server, check if the request was actually for
 // something which should probably be served as a static file
