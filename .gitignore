@@ -7,3 +7,4 @@ storage/cache/
 !distr.env
 !.empty
 composer.lock
+*.fdb
