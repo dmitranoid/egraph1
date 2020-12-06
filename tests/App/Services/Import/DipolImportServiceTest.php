@@ -25,7 +25,7 @@ class DipolImportServiceTest extends TestCase
     public function testUpdateGeoCoords()
     {
         $logger = new TestLogger();
-        $resCode = '111115';
+        $resCode = '111116';
         $dipolImportService = new DipolImportService($this->srcPdo, $this->dstPdo, $logger);
         $dipolImportService->updateGeoCoords($resCode);
 
@@ -70,7 +70,7 @@ class DipolImportServiceTest extends TestCase
       (ADDRESS = (PROTOCOL = TCP)(HOST = servoracle1)(PORT = 1521))
     )
     (CONNECT_DATA =
-      (SERVICE_NAME = orcl)
+      (SID = orcl)
     )
   )";
 

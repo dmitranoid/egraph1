@@ -14,12 +14,12 @@ $app->group('/api/v1/', function ($app) {
 
     $app->group('network/', function ($app) {
         /** @var App $app */
-        $app->get('mesh', 'App\Api\Controllers\EnergoMesh\EnergoMeshController:all');
-        $app->get('mesh/high', 'App\Api\Controllers\EnergoMesh\EnergoMeshController:highNetworks');
-        $app->get('mesh/low', 'App\Api\Controllers\EnergoMesh\EnergoMeshController:lowNetworks');
-        $app->get('tree', 'App\Api\Controllers\EnergoMesh\EnergoMeshController:all');
-        $app->get('tree/vl', 'App\Api\Controllers\EnergoMesh\EnergoMeshController:vl');
-        $app->get('tree/rs', 'App\Api\Controllers\EnergoMesh\EnergoMeshController:rs');
+        $app->get('mesh', '\App\Api\Controllers\EnergoMesh\EnergoMeshController:all');
+        $app->get('mesh/high', '\App\Api\Controllers\EnergoMesh\EnergoMeshController:highNetworks');
+        $app->get('mesh/low', '\App\Api\Controllers\EnergoMesh\EnergoMeshController:lowNetworks');
+//        $app->get('tree', 'App\Api\Controllers\EnergoMesh\EnergoMeshController:all');
+//        $app->get('tree/vl', [\App\Api\Controllers\EnergoMesh\EnergoMeshController::class, 'highNetworks']);
+//        $app->get('tree/rs', 'App\Api\Controllers\EnergoMesh\EnergoMeshController:rs');
     });
 
     $app->any('{class}/{method}', function ($request, $response, $args) use ($ci) {

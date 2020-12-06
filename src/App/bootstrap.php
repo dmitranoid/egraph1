@@ -33,7 +33,7 @@ if ('dev' == strtolower(getenv('ENV'))) {
     assert_options(ASSERT_ACTIVE, false);
 }
 
-$console = PHP_SAPI == 'cli' ? true : false;
+$console = PHP_SAPI == 'cli';
 
 if ($console) {
     set_time_limit(0);
