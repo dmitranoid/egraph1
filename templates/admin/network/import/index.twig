@@ -1,12 +1,23 @@
-{% extends '/admin/blank.twig' %}
+{% extends '/admin/app.twig' %}
+
+{% block TITLE %}Импорт даных из задачи DwRes2 {% endblock %}
 
 {% block CONTENT %}
-    <h1>admin template</h1>
-    <form action="">
-        <label for="fdb_server_path">fdb_server_path</label>
-        <input type="text" name="fdb_server_path">
-        <div>
-            <input type="button" value="импортировать данные">
+    <h2>Импорт даных из задачи DwRes2</h2>
+    <form method="POST" action="/admin/network/import/start">
+        <div class="container">
+            {% for db in dbList %}
+                <div class="columns">
+                    <div class="col-1"><input type="checkbox" name="{{ db.code }}"></div>
+                    <div class="col-2">{{ db.dbName }} </div>
+                    <div class="col-4">{{ db.connectionString }} </div>
+                    <div class="col-2">{{ db.status }}</div>
+                    <div class="col-2"></div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="container">
+            <input class="btn" type="submit" value="Начать импорт">
         </div>
     </form>
 {% endblock %}

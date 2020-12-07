@@ -4,8 +4,8 @@ return [
     'view' => [
         'template_path' => ROOT_DIR . '/templates',
         'twig' => [
-            'cache' => ROOT_DIR . '/storage/cache/twig',
-            'debug' => true,
+            'debug' => (getenv('ENV') === 'DEBUG'),
+            'cache' => false, //(getenv('ENV') === 'DEBUG') ? false : ROOT_DIR . '/storage/cache/twig',
             'auto_reload' => true,
         ],
     ],
@@ -13,7 +13,7 @@ return [
     // monolog settings
     'logger' => [
         'name' => 'app',
-        'path' => ROOT_DIR . '/storage/log/app.log',
+        'path' => ROOT_DIR . '/storage/logs/app.log',
     ],
     // db settings
     'database' => [

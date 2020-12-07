@@ -42,11 +42,11 @@ class OduDictImportService
             ->fetchAll();
 
         foreach ($oduSubstations as $substation) {
-            if (0 != $this->dstFPdo
-                ->from('energoObject')
-                ->where('code', $substation['code'])
-                ->count()
-            ){
+            if (0 !== $this->dstFPdo
+                    ->from('energoObject')
+                    ->where('code', $substation['code'])
+                    ->count()
+            ) {
                 continue;
             }
 

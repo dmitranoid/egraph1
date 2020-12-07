@@ -75,4 +75,9 @@ class TestController
         $response->getBody()->write(var_export($energoObject));
         return $response;
     }
+
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, $args)
+    {
+        return $this->view->render($response, '/admin/blank.twig', ['title' => 'title', 'content' => 'test']);
+    }
 }

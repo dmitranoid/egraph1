@@ -7,6 +7,7 @@ use App\ServiceProviders\PDOSQLiteServiceProvider;
 use App\ServiceProviders\TwigServiceProvider;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Slim\Interfaces\RouteParserInterface;
 use function DI\create;
 use function DI\get;
 use function DI\factory;
@@ -30,25 +31,22 @@ return [
     PDO::class => DI\factory(function (ContainerInterface $c) {
         return PDOSQLiteServiceProvider::register($c);
     }),
-    'db' => get(\PDO::class),
+    'db' => get(PDO::class),
 // factories
     'repositoryFactory' => function (ContainerInterface $c) {
-        $db = $c->get(\PDO::class);
-        $repositoryFactory = new App\Infrastructure\Repository\PDORepositoryFactory($db);
-        return $repositoryFactory;
+        $db = $c->get(PDO::class);
+        return new App\Infrastructure\Repository\PDORepositoryFactory($db);
     },
 
     'validatorFactory' => function (ContainerInterface $c) {
-        $validatorFactory = new App\Validators\ValidatorFactory();
-        return $validatorFactory;
+        return new App\Validators\ValidatorFactory();
     },
 
     'eventDispatcher' => factory(function ($logger) {
         return new App\Dispatchers\LoggerEventDispatcher($logger);
     })->parameter('logger', get('logger')),
 
-    \Slim\Interfaces\RouteParserInterface::class => factory(function (ContainerInterface $c) {
-
+    RouteParserInterface::class => factory(function (ContainerInterface $c) {
         return app()->getRouteCollector()->getRouteParser();
     })
 

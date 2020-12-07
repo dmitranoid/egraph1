@@ -26,16 +26,17 @@
 
     <script src="/js/app.js"></script>
 
-    <title>{% block TITLE %}Планы работ-{{ title }}{% endblock %}</title>
+    <title>{% block TITLE %}{{ title }}{% endblock %}</title>
 </head>
 <body>
 <div id="layout" class="container">
     <header class="navbar">
-        {% if (auth_loggedIn()) %}
+        {% if (false) %}
+            {# if (auth_loggedIn()) #}
             {% block NAVBAR %}{% include '_/menu.twig' %}{% endblock %}
         {% else %}
             <section class="navbar-section">
-                <a href="#" class="navbar-brand mr-2 disableClick">Задача "планы работ"</a>
+                <a href="#" class="navbar-brand mr-2 disableClick">Egraph</a>
             </section>
             <section class="navbar-section"></section>
         {% endif %}
@@ -89,7 +90,7 @@
     </div>
 </div>
 <script>
-    var flashMessages = {{ flash()|json_encode|raw }};
+    {# var flashMessages = {{ flash()|json_encode|raw }}; #}
 </script>
 {% block JSCODE %}{% endblock %}
 </body>
