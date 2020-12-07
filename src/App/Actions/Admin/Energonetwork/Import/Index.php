@@ -14,8 +14,12 @@ class Index extends GenericImportAction
     protected function action(): Response
     {
         $dbList = array(
-            new DwresDbDto('bar-sel', 'Барановичи село', "d:\\work\\egraph-test-data\\fdb\\Барановичский сельский РЭС.FDB", 'sysdba', 'masterkey', 'not defined'),
-            new DwresDbDto('gan', 'Ганцевичи', "d:\\work\\egraph-test-data\\fdb\\gan.FDB", 'sysdba', 'masterkey', 'not defined'),
+            new DwresDbDto('barg', 'Барановичи город', "d:\\work\\egraph-test-data\\fdb\\bars.FDB", 'sysdba', 'masterkey', 'not defined', null),
+            new DwresDbDto('bars', 'Барановичи село', "d:\\work\\egraph-test-data\\fdb\\bars.FDB", 'sysdba', 'masterkey', 'not defined', null),
+            new DwresDbDto('iva', 'Ивацевичи', "d:\\work\\egraph-test-data\\fdb\\iva.FDB", 'sysdba', 'masterkey', 'not defined', null),
+            new DwresDbDto('lah', 'Ляховичи', "d:\\work\\egraph-test-data\\fdb\\lah.FDB", 'sysdba', 'masterkey', 'not defined', null),
+            new DwresDbDto('gan', 'Ганцевичи', "d:\\work\\egraph-test-data\\fdb\\gan.FDB", 'sysdba', 'masterkey', 'not defined', null),
+            new DwresDbDto('ber', 'Береза', "d:\\work\\egraph-test-data\\fdb\\ber.FDB", 'sysdba', 'masterkey', 'not defined', null),
         );
         $data = compact('dbList');
         return $this->view->render($this->response, 'admin/network/import/index.twig', $data);
