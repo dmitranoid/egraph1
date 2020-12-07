@@ -15,44 +15,14 @@ use Slim\Interfaces\RouteParserInterface;
 
 abstract class Action
 {
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
+    protected LoggerInterface $logger;
+    protected ViewInterface $view;
+    protected Request $request;
+    protected Response $response;
+    protected Array $args;
+    protected \PDO $pdo;
+    protected RouteParserInterface $router;
 
-    /**
-     * @var ViewInterface
-     */
-    protected $view;
-
-    /**
-     * @var Request
-     */
-    protected $request;
-
-    /**
-     * @var Response
-     */
-    protected $response;
-
-    /**
-     * @var array
-     */
-    protected $args;
-
-    /** @var \PDO */
-    protected $pdo;
-    /**
-     * @var RouteParserInterface
-     */
-    protected $router;
-
-    /**
-     * @param LoggerInterface $logger
-     * @param ViewInterface $view
-     * @param RouteParserInterface $router
-     * @param \PDO $pdo
-     */
     public function __construct(LoggerInterface $logger,  ViewInterface $view, RouteParserInterface $router, \PDO $pdo)
     {
         $this->logger = $logger;
@@ -69,7 +39,7 @@ abstract class Action
      * @throws HttpNotFoundException
      * @throws HttpBadRequestException
      */
-    public function __invoke(Request $request, Response $response, $args): Response
+    public function __invoke(Request $request, Response $response, ?array $args): Response
     {
         $this->request = $request;
         $this->response = $response;
@@ -85,11 +55,6 @@ abstract class Action
 */
     }
 
-    /**
-     * @return Response
-     * @throws DomainRecordNotFoundException
-     * @throws HttpBadRequestException
-     */
     abstract protected function action(): Response;
 
     /**
@@ -107,11 +72,6 @@ abstract class Action
         return $input;
     }
 
-    /**
-     * @param  string $name
-     * @return mixed
-     * @throws HttpBadRequestException
-     */
     protected function resolveArg(string $name)
     {
         if (!isset($this->args[$name])) {
@@ -121,20 +81,12 @@ abstract class Action
         return $this->args[$name];
     }
 
-    /**
-     * @param  array|object|null $data
-     * @return Response
-     */
-    protected function respondWithData($data = null): Response
+    protected function respondWithData(?Array $data = null): Response
     {
         $payload = new ActionPayload(200, $data);
         return $this->respond($payload);
     }
 
-    /**
-     * @param ActionPayload $payload
-     * @return Response
-     */
     protected function respond(ActionPayload $payload): Response
     {
         $json = json_encode($payload, JSON_PRETTY_PRINT);

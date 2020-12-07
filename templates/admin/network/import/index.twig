@@ -8,7 +8,7 @@
         <div class="container">
             {% for db in dbList %}
                 <div class="columns">
-                    <div class="col-1"><input type="checkbox" name="{{ db.code }}"></div>
+                    <div class="col-1"><input type="checkbox" name="{{ db.code }}" value="{{ db.code }}"></div>
                     <div class="col-2">{{ db.dbName }} </div>
                     <div class="col-4">{{ db.connectionString }} </div>
                     <div class="col-2">{{ db.status }}</div>

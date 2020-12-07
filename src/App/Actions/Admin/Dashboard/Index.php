@@ -2,12 +2,12 @@
 declare(strict_types=1);
 
 
-namespace App\Http\Controllers\Admin\Dashboard;
+namespace App\Actions\Admin\Dashboard;
 
 
-use App\Http\Controllers\Admin\AdminPanelGenericController;
+use App\Actions\Admin\Energonetwork\Import\GenericImportAction;
 
-class Index extends AdminPanelGenericController
+class Index extends Action
 {
     protected function action()
     {

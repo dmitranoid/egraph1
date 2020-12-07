@@ -12,5 +12,7 @@ final class DoImport extends AdminPanelGenericController
     public function action()
     {
         $data = $this->request->getParsedBody();
+        // validate input data
+
     }
 }

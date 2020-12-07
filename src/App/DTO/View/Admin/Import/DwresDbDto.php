@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\DTO\View\Admin\Import;
 
 
-class DwresDB
+class DwresDbDto
 {
     public string $code;
     public string $dbName;

@@ -1,12 +1,11 @@
 <?php
 // Routes
 
-/** @var App $app */
 
-use App\Actions\Admin\Energonetwork\Import\Index;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Slim\App;
+
+/** @var Slim\App $app */
 
 $app->get('/', function (RequestInterface $request, ResponseInterface $response, $args) use ($app) {
     $response->getBody()->write('homepage');
@@ -14,10 +13,10 @@ $app->get('/', function (RequestInterface $request, ResponseInterface $response,
 })->setName('homepage');
 
 $app->group('/admin', function ($app) {
-    /** @var App $app */
-    $app->get('/', App\Http\Controllers\Admin\Dashboard\Index::class)->setName('adm.dashboard.index');
-    $app->get('/network/import', App\Http\Controllers\Admin\Energonetwork\Import\Index::class)->setName('adm.network.import.index');
-    $app->post('/network/import/start', App\Http\Controllers\Admin\Energonetwork\Import\DoImport::class)->setName('adm.network.import.doimport');
+    /** @var Slim\App $app */
+    $app->get('/', \App\Actions\Admin\Dashboard\Index::class)->setName('adm.dashboard.index');
+    $app->get('/network/import', \App\Actions\Admin\Energonetwork\Import\Index::class)->setName('adm.network.import.index');
+    $app->post('/network/import/start', \App\Actions\Admin\Energonetwork\Import\DoImport::class)->setName('adm.network.import.doimport');
 
 });
 
