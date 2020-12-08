@@ -12,21 +12,14 @@ use Psr\Log\LoggerInterface;
 
 class ImportEnergoMeshCommandHandler implements CommandHandlerInterface
 {
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private LoggerInterface $logger;
 
     public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;
     }
 
-    /**
-     * @param ImportEnergoMeshCommand $command
-     * @throws ApplicationException
-     * @return void
-     */
+
     public function handle(ImportEnergoMeshCommand $command):void
     {
         $this->logger->info('import started');

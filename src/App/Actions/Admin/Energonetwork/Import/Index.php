@@ -13,6 +13,7 @@ class Index extends GenericImportAction
 {
     protected function action(): Response
     {
+        // TODO забирать из конфига
         $dbList = array(
             new DwresDbDto('barg', 'Барановичи город', "d:\\work\\egraph-test-data\\fdb\\bars.FDB", 'sysdba', 'masterkey', 'not defined', null),
             new DwresDbDto('bars', 'Барановичи село', "d:\\work\\egraph-test-data\\fdb\\bars.FDB", 'sysdba', 'masterkey', 'not defined', null),
@@ -21,8 +22,7 @@ class Index extends GenericImportAction
             new DwresDbDto('gan', 'Ганцевичи', "d:\\work\\egraph-test-data\\fdb\\gan.FDB", 'sysdba', 'masterkey', 'not defined', null),
             new DwresDbDto('ber', 'Береза', "d:\\work\\egraph-test-data\\fdb\\ber.FDB", 'sysdba', 'masterkey', 'not defined', null),
         );
-        $data = compact('dbList');
-        return $this->view->render($this->response, 'admin/network/import/index.twig', $data);
+        return $this->view->render($this->response, 'admin/network/import/index.twig', compact('dbList'));
     }
 
 }

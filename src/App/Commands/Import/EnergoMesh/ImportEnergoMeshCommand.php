@@ -8,14 +8,8 @@ use App\Commands\CommandInterface;
 
 class ImportEnergoMeshCommand implements CommandInterface
 {
-    /**
-     * @var \PDO
-     */
-    public $dstPdo;
-    /**
-     * @var \PDO
-     */
-    public $srcPdo;
+    public \PDO $dstPdo;
+    public \PDO $srcPdo;
 
     public function __construct(\PDO $srcPdo, \PDO $dstPdo)
     {

@@ -7,21 +7,16 @@ namespace App\Services\Import;
 use App\Exceptions\ApplicationException;
 use Envms\FluentPDO\Exception;
 use Envms\FluentPDO\Query;
-use PDO;
+use \PDO;
 use PDOException;
 use Psr\Log\LoggerInterface;
 
 class DwresImportService implements ImportServiceInterface
 {
 
-    /** @var Query */
-    private $srcFPdo;
-
-    /** @var Query */
-    private $dstFPdo;
-
-    /** @var LoggerInterface */
-    private $logger;
+    private Query $srcFPdo;
+    private Query $dstFPdo;
+    private LoggerInterface $logger;
 
     public function __construct(PDO $srcPdo, PDO $dstPdo, LoggerInterface $logger)
     {
